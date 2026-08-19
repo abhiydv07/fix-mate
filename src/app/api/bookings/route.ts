@@ -33,10 +33,19 @@ export async function POST(request: Request) {
 
     const { serviceId, addressId, scheduledAt, notes } = validation.data;
 
+    // Fetch delivery address details to get pincode
+    const { data: addressData } = await supabase
+      .from("addresses")
+      .select("pincode, line1, city")
+      .eq("id", addressId)
+      .single();
+
+    const deliveryPincode = addressData?.pincode || "560038";
+
     // Fetch base price of the service
     const { data: serviceData } = await supabase
       .from("services")
-      .select("base_price")
+      .select("base_price, name")
       .eq("id", serviceId)
       .single();
 
@@ -44,7 +53,7 @@ export async function POST(request: Request) {
     const convenienceFee = 49;
     const totalPrice = basePrice + convenienceFee;
 
-    // Double-Booking Check: Verify no existing active booking overlaps at the exact same scheduled_at for the customer
+    // Double-Booking Check for Customer
     const { data: existingBookings } = await supabase
       .from("bookings")
       .select("id")
@@ -59,7 +68,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Insert new booking record with status 'pending'
+    // Provider Matching Engine: Find available verified providers offering serviceId in deliveryPincode
+    const { data: matchedProviders } = await supabase
+      .from("provider_profiles")
+      .select("id, avg_rating, provider_services(service_id)")
+      .eq("verified", true)
+      .eq("is_available", true)
+      .contains("service_area_pincodes", [deliveryPincode])
+      .order("avg_rating", { ascending: false });
+
+    console.log(
+      `🎯 Provider Match: Found ${matchedProviders?.length || 0} providers for pincode ${deliveryPincode}`
+    );
+
+    // Insert new booking record with status 'pending' (Broadcasted to matched providers)
     const { data: newBooking, error: insertError } = await supabase
       .from("bookings")
       .insert({
@@ -78,7 +100,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Database error creating booking" }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, booking: newBooking }, { status: 201 });
+    return NextResponse.json(
+      {
+        success: true,
+        booking: newBooking,
+        matchedProvidersCount: matchedProviders?.length || 0,
+      },
+      { status: 201 }
+    );
   } catch (err: unknown) {
     console.error("POST /api/bookings error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -101,7 +130,7 @@ export async function GET(request: Request) {
     let query = supabase.from("bookings").select("*");
 
     if (userRole === "provider") {
-      // Provider sees assigned bookings or open pending bookings
+      // Provider sees assigned bookings or open pending broadcasts
       query = query.or(`provider_id.eq.${user.id},status.eq.pending`);
     } else if (userRole === "admin") {
       // Admin sees all
