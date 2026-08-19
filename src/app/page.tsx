@@ -1,16 +1,9 @@
 import Link from "next/link";
-import { Wrench, ShieldCheck, Clock, MapPin, Search, User, Calendar, Zap } from "lucide-react";
+import { Wrench, ShieldCheck, Clock, MapPin, User, Calendar, Zap } from "lucide-react";
 import { SupabaseConnectionStatus } from "@/components/SupabaseConnectionStatus";
+import { ServiceCatalog } from "@/components/ServiceCatalog";
 
 export default function Home() {
-  const categories = [
-    { id: "plumbing", name: "Plumbing", icon: "🚰", desc: "Leaks, pipes, fittings", count: "124 Pro's" },
-    { id: "electrical", name: "Electrical", icon: "⚡", desc: "Wiring, fixtures, breaker", count: "98 Pro's" },
-    { id: "cleaning", name: "Cleaning", icon: "🧹", desc: "Deep clean, sofa, kitchen", count: "210 Pro's" },
-    { id: "appliances", name: "Appliances", icon: "🔌", desc: "AC repair, fridge, washer", count: "85 Pro's" },
-    { id: "painting", name: "Painting", icon: "🎨", desc: "Wall touchup, full home", count: "64 Pro's" },
-    { id: "carpentry", name: "Carpentry", icon: "🪚", desc: "Furniture, doors, locks", count: "72 Pro's" },
-  ];
 
   return (
     <div className="flex-1 flex flex-col pb-20 md:pb-8">
@@ -43,25 +36,14 @@ export default function Home() {
 
       {/* Hero Section */}
       <main className="flex-1 px-4 pt-6 space-y-6">
-        {/* Search Bar & Location Banner */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-xs text-slate-400 px-1">
-            <MapPin className="w-3.5 h-3.5 text-brand-400" />
-            <span>Delivering to: <strong className="text-slate-200">Indiranagar, Bengaluru</strong></span>
-          </div>
-          
-          <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search 'AC repair', 'Plumber', 'Sofa cleaning'..."
-              className="w-full pl-10 pr-4 py-3 rounded-2xl bg-slate-900/90 border border-slate-800 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500/60 focus:ring-1 focus:ring-brand-500/40 transition-all shadow-inner"
-            />
-          </div>
-
-          {/* Supabase Server Connection Verification */}
-          <SupabaseConnectionStatus />
+        {/* Location Banner */}
+        <div className="flex items-center gap-2 text-xs text-slate-400 px-1">
+          <MapPin className="w-3.5 h-3.5 text-brand-400" />
+          <span>Delivering to: <strong className="text-slate-200">Indiranagar, Bengaluru</strong></span>
         </div>
+
+        {/* Supabase Connection Status Badge */}
+        <SupabaseConnectionStatus />
 
         {/* Feature Highlight Cards */}
         <div className="grid grid-cols-3 gap-2.5">
@@ -82,37 +64,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Service Categories Grid */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-slate-100">Popular Services</h2>
-            <span className="text-xs text-brand-400 hover:underline cursor-pointer">View all</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {categories.map((cat) => (
-              <div
-                key={cat.id}
-                className="group relative p-4 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-brand-500/40 hover:bg-slate-900 transition-all cursor-pointer shadow-sm hover:shadow-brand-500/5"
-              >
-                <div className="flex items-start justify-between">
-                  <span className="text-2xl p-2 rounded-xl bg-slate-800/70 border border-slate-700/50 group-hover:scale-110 transition-transform">
-                    {cat.icon}
-                  </span>
-                  <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">
-                    {cat.count}
-                  </span>
-                </div>
-                <div className="mt-3">
-                  <h3 className="text-sm font-semibold text-slate-100 group-hover:text-brand-300 transition-colors">
-                    {cat.name}
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">{cat.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Interactive Dynamic Service Catalog */}
+        <ServiceCatalog />
 
         {/* Promo / Banner */}
         <div className="p-4 rounded-2xl bg-gradient-to-r from-brand-900/40 to-slate-900 border border-brand-500/30 flex items-center justify-between">
