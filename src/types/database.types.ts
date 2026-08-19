@@ -12,33 +12,154 @@ export interface Database {
       profiles: {
         Row: {
           id: string;
-          email: string;
-          full_name: string | null;
-          phone: string | null;
           role: 'customer' | 'provider' | 'admin';
+          name: string | null;
+          phone: string | null;
           avatar_url: string | null;
           created_at: string;
-          updated_at: string;
         };
         Insert: {
           id: string;
-          email: string;
-          full_name?: string | null;
-          phone?: string | null;
           role?: 'customer' | 'provider' | 'admin';
+          name?: string | null;
+          phone?: string | null;
           avatar_url?: string | null;
           created_at?: string;
-          updated_at?: string;
         };
         Update: {
           id?: string;
-          email?: string;
-          full_name?: string | null;
-          phone?: string | null;
           role?: 'customer' | 'provider' | 'admin';
+          name?: string | null;
+          phone?: string | null;
           avatar_url?: string | null;
           created_at?: string;
-          updated_at?: string;
+        };
+      };
+      categories: {
+        Row: {
+          id: string;
+          name: string;
+          icon: string | null;
+          active: boolean;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          icon?: string | null;
+          active?: boolean;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          icon?: string | null;
+          active?: boolean;
+        };
+      };
+      services: {
+        Row: {
+          id: string;
+          category_id: string;
+          name: string;
+          description: string | null;
+          base_price: number;
+          est_duration_min: number | null;
+        };
+        Insert: {
+          id?: string;
+          category_id: string;
+          name: string;
+          description?: string | null;
+          base_price: number;
+          est_duration_min?: number | null;
+        };
+        Update: {
+          id?: string;
+          category_id?: string;
+          name?: string;
+          description?: string | null;
+          base_price?: number;
+          est_duration_min?: number | null;
+        };
+      };
+      provider_profiles: {
+        Row: {
+          id: string;
+          bio: string | null;
+          service_area_pincodes: string[] | null;
+          kyc_doc_url: string | null;
+          verified: boolean;
+          avg_rating: number;
+          is_available: boolean;
+        };
+        Insert: {
+          id: string;
+          bio?: string | null;
+          service_area_pincodes?: string[] | null;
+          kyc_doc_url?: string | null;
+          verified?: boolean;
+          avg_rating?: number;
+          is_available?: boolean;
+        };
+        Update: {
+          id?: string;
+          bio?: string | null;
+          service_area_pincodes?: string[] | null;
+          kyc_doc_url?: string | null;
+          verified?: boolean;
+          avg_rating?: number;
+          is_available?: boolean;
+        };
+      };
+      provider_services: {
+        Row: {
+          provider_id: string;
+          service_id: string;
+        };
+        Insert: {
+          provider_id: string;
+          service_id: string;
+        };
+        Update: {
+          provider_id?: string;
+          service_id?: string;
+        };
+      };
+      addresses: {
+        Row: {
+          id: string;
+          user_id: string;
+          label: string | null;
+          line1: string;
+          line2: string | null;
+          city: string;
+          pincode: string;
+          lat: number | null;
+          lng: number | null;
+          is_default: boolean;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          label?: string | null;
+          line1: string;
+          line2?: string | null;
+          city: string;
+          pincode: string;
+          lat?: number | null;
+          lng?: number | null;
+          is_default?: boolean;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          label?: string | null;
+          line1?: string;
+          line2?: string | null;
+          city?: string;
+          pincode?: string;
+          lat?: number | null;
+          lng?: number | null;
+          is_default?: boolean;
         };
       };
       bookings: {
@@ -46,43 +167,112 @@ export interface Database {
           id: string;
           customer_id: string;
           provider_id: string | null;
-          category_id: string;
-          status: 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled' | 'disputed';
+          service_id: string;
+          address_id: string;
+          status: 'pending' | 'assigned' | 'on_the_way' | 'in_progress' | 'completed' | 'cancelled';
           scheduled_at: string;
-          address: string;
-          total_amount: number;
-          payment_method: string;
-          payment_status: 'pending' | 'paid' | 'refunded';
+          price: number;
           created_at: string;
-          updated_at: string;
         };
         Insert: {
           id?: string;
           customer_id: string;
           provider_id?: string | null;
-          category_id: string;
-          status?: 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled' | 'disputed';
+          service_id: string;
+          address_id: string;
+          status?: 'pending' | 'assigned' | 'on_the_way' | 'in_progress' | 'completed' | 'cancelled';
           scheduled_at: string;
-          address: string;
-          total_amount: number;
-          payment_method?: string;
-          payment_status?: 'pending' | 'paid' | 'refunded';
+          price: number;
           created_at?: string;
-          updated_at?: string;
         };
         Update: {
           id?: string;
           customer_id?: string;
           provider_id?: string | null;
-          category_id?: string;
-          status?: 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled' | 'disputed';
+          service_id?: string;
+          address_id?: string;
+          status?: 'pending' | 'assigned' | 'on_the_way' | 'in_progress' | 'completed' | 'cancelled';
           scheduled_at?: string;
-          address?: string;
-          total_amount?: number;
-          payment_method?: string;
-          payment_status?: 'pending' | 'paid' | 'refunded';
+          price?: number;
           created_at?: string;
-          updated_at?: string;
+        };
+      };
+      payments: {
+        Row: {
+          id: string;
+          booking_id: string;
+          amount: number;
+          method: string;
+          status: 'pending' | 'collected' | 'disputed';
+          confirmed_by_provider: boolean;
+          confirmed_by_customer: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          booking_id: string;
+          amount: number;
+          method?: string;
+          status?: 'pending' | 'collected' | 'disputed';
+          confirmed_by_provider?: boolean;
+          confirmed_by_customer?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          booking_id?: string;
+          amount?: number;
+          method?: string;
+          status?: 'pending' | 'collected' | 'disputed';
+          confirmed_by_provider?: boolean;
+          confirmed_by_customer?: boolean;
+          created_at?: string;
+        };
+      };
+      reviews: {
+        Row: {
+          id: string;
+          booking_id: string;
+          rating: number;
+          comment: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          booking_id: string;
+          rating: number;
+          comment?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          booking_id?: string;
+          rating?: number;
+          comment?: string | null;
+          created_at?: string;
+        };
+      };
+      chat_messages: {
+        Row: {
+          id: string;
+          booking_id: string;
+          sender_id: string;
+          message: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          booking_id: string;
+          sender_id: string;
+          message: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          booking_id?: string;
+          sender_id?: string;
+          message?: string;
+          created_at?: string;
         };
       };
     };
