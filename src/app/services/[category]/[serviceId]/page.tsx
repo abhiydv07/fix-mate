@@ -98,7 +98,7 @@ export default async function CategoryServiceDetailPage({
           <p className="text-lg font-black text-white">₹{service.base_price}</p>
         </div>
 
-        <Link href={`/login?redirectTo=/bookings`}>
+        <Link href={`/book/${service.id}`}>
           <Button className="px-6 py-3 text-xs font-bold shadow-lg shadow-brand-500/20 flex items-center gap-2">
             <Calendar className="w-4 h-4" /> Book Professional Now
           </Button>
