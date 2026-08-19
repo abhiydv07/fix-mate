@@ -37,8 +37,8 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Guard protected routes
-  const protectedRoutes = ['/bookings', '/profile', '/admin'];
+  // Guard protected routes: /dashboard, /provider, /admin, /bookings, /profile
+  const protectedRoutes = ['/dashboard', '/provider', '/admin', '/bookings', '/profile'];
   const isProtectedRoute = protectedRoutes.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
@@ -47,6 +47,19 @@ export async function middleware(request: NextRequest) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirectTo', request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  // Role-based route protection
+  if (user) {
+    const userRole = user.user_metadata?.role || 'customer';
+
+    if (request.nextUrl.pathname.startsWith('/admin') && userRole !== 'admin') {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+
+    if (request.nextUrl.pathname.startsWith('/provider') && userRole !== 'provider' && userRole !== 'admin') {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
   }
 
   return response;

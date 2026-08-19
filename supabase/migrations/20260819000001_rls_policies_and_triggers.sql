@@ -31,10 +31,10 @@ CREATE TRIGGER on_auth_user_created
 -- ========================================================
 
 -- PROFILES
-CREATE POLICY "Public profiles are viewable by authenticated users"
+CREATE POLICY "Users can select own profile"
   ON public.profiles FOR SELECT
   TO authenticated
-  USING (true);
+  USING (auth.uid() = id);
 
 CREATE POLICY "Users can update own profile"
   ON public.profiles FOR UPDATE
