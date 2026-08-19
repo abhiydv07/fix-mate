@@ -243,8 +243,24 @@ export default function ProviderJobsPage() {
                     )}
 
                     {job.status === "completed" && (
-                      <div className="w-full p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center text-xs font-bold text-emerald-400 flex items-center justify-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4" /> Service Completed & Payment Collected
+                      <div className="w-full space-y-2">
+                        <div className="w-full p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center text-xs font-bold text-emerald-400 flex items-center justify-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4" /> Service Completed
+                        </div>
+                        <Button
+                          onClick={async () => {
+                            await fetch("/api/payments/confirm", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ bookingId: job.id, role: "provider" }),
+                            });
+                            alert("Cash collection recorded!");
+                          }}
+                          size="sm"
+                          className="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-extrabold py-2"
+                        >
+                          Mark ₹{job.price} Cash Collected
+                        </Button>
                       </div>
                     )}
                   </div>

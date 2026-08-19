@@ -273,6 +273,35 @@ export default function OrderTrackingPage({
 
             {/* Per-Booking Realtime Live Chat Panel */}
             <BookingChatPanel bookingId={order.id} currentUserId={order.customer_id} />
+
+            {/* Cash Confirmation & Tax Invoice Link */}
+            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-slate-200">Payment & Tax Invoice</span>
+                <Link
+                  href={`/orders/${order.id}/invoice`}
+                  className="text-xs text-brand-400 hover:underline font-semibold"
+                >
+                  View Tax Invoice →
+                </Link>
+              </div>
+
+              {order.status === "completed" && (
+                <button
+                  onClick={async () => {
+                    await fetch("/api/payments/confirm", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ bookingId: order.id, role: "customer" }),
+                    });
+                    alert("Thank you! Your payment confirmation has been recorded.");
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20"
+                >
+                  <CheckCircle2 className="w-4 h-4" /> Confirm I Paid ₹{order.price} Cash
+                </button>
+              )}
+            </div>
           </div>
         )}
       </main>
