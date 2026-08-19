@@ -57,6 +57,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Failed to send message" }, { status: 500 });
     }
 
+    // Fire notification to recipient (if user is customer -> send to provider, else customer)
+    const recipientId = user.id === booking.customer_id ? booking.provider_id : booking.customer_id;
+    if (recipientId) {
+      await supabase.from("notifications").insert({
+        user_id: recipientId,
+        title: "New Chat Message 💬",
+        body: `You received a message: "${message.slice(0, 40)}${message.length > 40 ? "..." : ""}"`,
+      });
+    }
+
     return NextResponse.json({ success: true, message: newMessage }, { status: 201 });
   } catch (err: unknown) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

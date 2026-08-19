@@ -50,6 +50,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Fire Notification to Customer
+    if (updatedBooking.customer_id) {
+      await supabase.from("notifications").insert({
+        user_id: updatedBooking.customer_id,
+        title: "Service Pro Assigned! 🛠️",
+        body: `A verified service partner accepted your booking #${updatedBooking.id.slice(0, 8)}.`,
+      });
+    }
+
     return NextResponse.json({ success: true, booking: updatedBooking });
   } catch (err: unknown) {
     console.error("Accept booking error:", err);

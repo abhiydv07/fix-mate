@@ -1,8 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Wrench, MapPin, User, LogIn, ShieldCheck } from "lucide-react";
+import { Wrench, MapPin, User, LogIn, ShieldCheck, Bell, Check, X } from "lucide-react";
+import { getUserNotifications, markNotificationAsRead, NotificationItem } from "@/lib/notifications";
+import { createClient } from "@/lib/supabase/client";
 
 interface HeaderProps {
   userRole?: string;
@@ -11,6 +14,48 @@ interface HeaderProps {
 }
 
 export function Header({ userRole = "customer", userName, avatarUrl }: HeaderProps) {
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const supabase = createClient();
+
+  useEffect(() => {
+    loadNotifications();
+
+    // Subscribe to Supabase Realtime updates on notifications table
+    const channel = supabase
+      .channel("header-notifications")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+        },
+        (payload) => {
+          setNotifications((prev) => [payload.new as NotificationItem, ...prev]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  async function loadNotifications() {
+    const data = await getUserNotifications();
+    setNotifications(data);
+  }
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const handleMarkAsRead = async (id: string) => {
+    await markNotificationAsRead(id);
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    );
+  };
+
   return (
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-slate-950/90 border-b border-slate-800/80 px-4 md:px-8 py-3.5 flex items-center justify-between">
       {/* Brand Logo */}
@@ -38,6 +83,60 @@ export function Header({ userRole = "customer", userName, avatarUrl }: HeaderPro
           <ShieldCheck className="w-3.5 h-3.5" />
           Pay on Work
         </span>
+
+        {/* Notification Bell Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700 transition-colors relative"
+          >
+            <Bell className="w-4 h-4" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center animate-pulse">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+
+          {isOpen && (
+            <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-slate-950 border border-slate-800 shadow-2xl p-3 space-y-2 z-50">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span className="font-bold text-xs text-slate-100">Notifications</span>
+                <span className="text-[10px] font-semibold text-brand-400 bg-brand-500/10 px-2 py-0.5 rounded">
+                  {unreadCount} unread
+                </span>
+              </div>
+
+              <div className="max-h-64 overflow-y-auto divide-y divide-slate-800/60 text-xs">
+                {notifications.length === 0 ? (
+                  <p className="p-4 text-center text-slate-500 text-[11px]">No notifications yet</p>
+                ) : (
+                  notifications.map((n) => (
+                    <div
+                      key={n.id}
+                      className={`p-2.5 space-y-1 transition-colors ${
+                        n.read ? "opacity-60" : "bg-slate-900/50"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-bold text-slate-200 text-[11px]">{n.title}</h4>
+                        {!n.read && (
+                          <button
+                            onClick={() => handleMarkAsRead(n.id)}
+                            className="text-[9px] text-brand-400 hover:underline"
+                          >
+                            Mark read
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-slate-400 leading-snug">{n.body}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
 
         {userName ? (
           <Link

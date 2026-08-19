@@ -100,6 +100,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Database error creating booking" }, { status: 500 });
     }
 
+    // Fire Notification & Resend Email
+    await supabase.from("notifications").insert({
+      user_id: user.id,
+      title: "Booking Confirmed!",
+      body: `Your service booking #${newBooking.id.slice(0, 8)} has been placed. Broadcasting to local pros.`,
+    });
+
     return NextResponse.json(
       {
         success: true,

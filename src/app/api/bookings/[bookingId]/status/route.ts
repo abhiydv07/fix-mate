@@ -45,6 +45,29 @@ export async function PATCH(
       return NextResponse.json({ error: "Failed to update booking status" }, { status: 500 });
     }
 
+    // Fire Notification on Status Update
+    if (updatedBooking.customer_id) {
+      const statusTitle =
+        status === "on_the_way"
+          ? "Pro On The Way! 🚗"
+          : status === "in_progress"
+          ? "Work In Progress 🛠️"
+          : status === "completed"
+          ? "Service Completed! 🎉"
+          : "Status Updated";
+
+      const statusBody =
+        status === "completed"
+          ? `Your booking #${updatedBooking.id.slice(0, 8)} is complete. Thank you for choosing Fix Mate!`
+          : `Booking #${updatedBooking.id.slice(0, 8)} status changed to ${status.replace(/_/g, " ")}.`;
+
+      await supabase.from("notifications").insert({
+        user_id: updatedBooking.customer_id,
+        title: statusTitle,
+        body: statusBody,
+      });
+    }
+
     return NextResponse.json({ success: true, booking: updatedBooking });
   } catch (err: unknown) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
