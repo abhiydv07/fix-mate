@@ -6,6 +6,7 @@ export interface BookingPayload {
   scheduled_at: string;
   price: number;
   notes?: string;
+  couponCode?: string;
 }
 
 export interface BookingItem {
@@ -32,6 +33,7 @@ export async function createBooking(payload: BookingPayload): Promise<{ success:
         addressId: payload.address_id,
         scheduledAt: payload.scheduled_at,
         notes: payload.notes,
+        couponCode: payload.couponCode,
       }),
     });
 

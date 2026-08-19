@@ -8,6 +8,7 @@ const bookingSchema = z.object({
   addressId: z.string().min(1, "addressId is required"),
   scheduledAt: z.string().datetime({ message: "Invalid scheduledAt ISO timestamp" }),
   notes: z.string().optional(),
+  couponCode: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { serviceId, addressId, scheduledAt, notes } = validation.data;
+    const { serviceId, addressId, scheduledAt, notes, couponCode } = validation.data;
 
     // Fetch delivery address details to get pincode
     const { data: addressData } = await supabase
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
 
     const deliveryPincode = addressData?.pincode || "560038";
 
-    // Fetch base price of the service
+    // Fetch base price of the service from database
     const { data: serviceData } = await supabase
       .from("services")
       .select("base_price, name")
@@ -51,7 +52,31 @@ export async function POST(request: Request) {
 
     const basePrice = serviceData ? Number(serviceData.base_price) : 299;
     const convenienceFee = 49;
-    const totalPrice = basePrice + convenienceFee;
+    let discountAmount = 0;
+
+    // SERVER RE-VALIDATION OF COUPON: Never trust client-sent discounted price!
+    if (couponCode && couponCode.trim()) {
+      const codeUpper = couponCode.trim().toUpperCase();
+
+      const { data: coupon } = await supabase
+        .from("coupons")
+        .select("*")
+        .eq("code", codeUpper)
+        .eq("active", true)
+        .gte("valid_until", new Date().toISOString())
+        .single();
+
+      if (coupon) {
+        if (coupon.discount_type === "flat") {
+          discountAmount = Number(coupon.value);
+        } else if (coupon.discount_type === "percent") {
+          discountAmount = (basePrice * Number(coupon.value)) / 100;
+        }
+      }
+    }
+
+    // Recalculate total price strictly server-side
+    const totalPrice = Math.max(0, basePrice + convenienceFee - discountAmount);
 
     // Double-Booking Check for Customer
     const { data: existingBookings } = await supabase
@@ -77,11 +102,7 @@ export async function POST(request: Request) {
       .contains("service_area_pincodes", [deliveryPincode])
       .order("avg_rating", { ascending: false });
 
-    console.log(
-      `🎯 Provider Match: Found ${matchedProviders?.length || 0} providers for pincode ${deliveryPincode}`
-    );
-
-    // Insert new booking record with status 'pending' (Broadcasted to matched providers)
+    // Insert new booking record with status 'pending'
     const { data: newBooking, error: insertError } = await supabase
       .from("bookings")
       .insert({
@@ -137,12 +158,10 @@ export async function GET(request: Request) {
     let query = supabase.from("bookings").select("*");
 
     if (userRole === "provider") {
-      // Provider sees assigned bookings or open pending broadcasts
       query = query.or(`provider_id.eq.${user.id},status.eq.pending`);
     } else if (userRole === "admin") {
       // Admin sees all
     } else {
-      // Customer sees own bookings
       query = query.eq("customer_id", user.id);
     }
 

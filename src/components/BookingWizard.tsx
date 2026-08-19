@@ -39,6 +39,11 @@ export function BookingWizard({ service }: BookingWizardProps) {
   // Step 3: Notes State
   const [notes, setNotes] = useState<string>("");
 
+  // Step 4: Coupon State
+  const [couponInput, setCouponInput] = useState<string>("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [couponError, setCouponError] = useState<string>("");
+
   // Step 4: Submission State
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [bookingSuccess, setBookingSuccess] = useState<boolean>(false);
@@ -96,7 +101,23 @@ export function BookingWizard({ service }: BookingWizardProps) {
   const selectedAddressObj = addresses.find((a) => a.id === selectedAddressId) || addresses[0];
 
   const convenienceFee = 49;
-  const totalPrice = service.base_price + convenienceFee;
+  const discountAmount = appliedCoupon ? appliedCoupon.discount : 0;
+  const totalPrice = Math.max(0, service.base_price + convenienceFee - discountAmount);
+
+  const handleApplyCoupon = () => {
+    setCouponError("");
+    const code = couponInput.trim().toUpperCase();
+    if (!code) return;
+
+    if (code === "WELCOME50") {
+      setAppliedCoupon({ code: "WELCOME50", discount: 50 });
+    } else if (code === "FIXMATE20") {
+      const disc = Math.round((service.base_price * 20) / 100);
+      setAppliedCoupon({ code: "FIXMATE20", discount: disc });
+    } else {
+      setCouponError("Invalid or expired coupon code.");
+    }
+  };
 
   const handleConfirmBooking = async () => {
     if (!selectedAddressId) {
@@ -115,6 +136,7 @@ export function BookingWizard({ service }: BookingWizardProps) {
       scheduled_at: scheduledTimestamp,
       price: totalPrice,
       notes: notes,
+      couponCode: appliedCoupon?.code,
     });
 
     setIsSubmitting(false);
@@ -431,11 +453,40 @@ export function BookingWizard({ service }: BookingWizardProps) {
                 <span>Safety & Convenience Fee:</span>
                 <span>₹{convenienceFee}</span>
               </div>
-              <div className="flex justify-between text-sm font-extrabold text-white pt-1">
+              {appliedCoupon && (
+                <div className="flex justify-between text-[11px] text-emerald-400 font-semibold">
+                  <span>Promo Discount ({appliedCoupon.code}):</span>
+                  <span>-₹{appliedCoupon.discount}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm font-extrabold text-white pt-1 border-t border-slate-800/60">
                 <span>Total Amount Payable:</span>
                 <span className="text-emerald-400">₹{totalPrice}</span>
               </div>
             </div>
+          </div>
+
+          {/* Promo Code Input */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold text-slate-300">Apply Promo / Coupon Code</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={couponInput}
+                onChange={(e) => setCouponInput(e.target.value)}
+                placeholder="e.g. WELCOME50 or FIXMATE20"
+                className="flex-1 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 uppercase placeholder-slate-500 focus:outline-none focus:border-brand-500"
+              />
+              <Button type="button" size="sm" variant="outline" onClick={handleApplyCoupon} className="text-xs">
+                Apply
+              </Button>
+            </div>
+            {couponError && <p className="text-[10px] text-rose-400">{couponError}</p>}
+            {appliedCoupon && (
+              <p className="text-[10px] text-emerald-400 font-semibold">
+                ✓ Coupon {appliedCoupon.code} applied! Saved ₹{appliedCoupon.discount}.
+              </p>
+            )}
           </div>
 
           {/* Pay on Work Banner */}
