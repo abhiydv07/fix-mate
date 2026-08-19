@@ -119,10 +119,10 @@ export function BookingWizard({ service }: BookingWizardProps) {
 
     setIsSubmitting(false);
 
-    if (result || true) {
+    if (result.success) {
       setBookingSuccess(true);
     } else {
-      setErrorMsg("Failed to record booking. Please try again.");
+      setErrorMsg(result.error || "Failed to record booking. Please try again.");
     }
   };
 

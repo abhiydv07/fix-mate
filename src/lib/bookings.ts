@@ -20,56 +20,39 @@ export interface BookingItem {
   created_at: string;
 }
 
-export async function createBooking(payload: BookingPayload): Promise<BookingItem | null> {
+export async function createBooking(payload: BookingPayload): Promise<{ success: boolean; booking?: BookingItem; error?: string }> {
   try {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const res = await fetch("/api/bookings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        serviceId: payload.service_id,
+        addressId: payload.address_id,
+        scheduledAt: payload.scheduled_at,
+        notes: payload.notes,
+      }),
+    });
 
-    if (!user) {
-      console.warn("User must be logged in to create a booking.");
-      return null;
+    const data = await res.json();
+
+    if (!res.ok) {
+      return { success: false, error: data.error || "Booking failed" };
     }
 
-    const { data, error } = await supabase
-      .from("bookings")
-      .insert({
-        customer_id: user.id,
-        service_id: payload.service_id,
-        address_id: payload.address_id,
-        status: "pending",
-        scheduled_at: payload.scheduled_at,
-        price: payload.price,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Booking creation error:", error.message);
-      return null;
-    }
-
-    return data as BookingItem;
-  } catch (err) {
-    console.error("Supabase booking error:", err);
-    return null;
+    return { success: true, booking: data.booking };
+  } catch (err: unknown) {
+    return { success: false, error: err instanceof Error ? err.message : "Network error" };
   }
 }
 
 export async function getUserBookings(): Promise<BookingItem[]> {
   try {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) return [];
-
-    const { data, error } = await supabase
-      .from("bookings")
-      .select("*")
-      .eq("customer_id", user.id)
-      .order("created_at", { ascending: false });
-
-    if (error || !data) return [];
-    return data as BookingItem[];
+    const res = await fetch("/api/bookings");
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.bookings || [];
   } catch {
     return [];
   }
