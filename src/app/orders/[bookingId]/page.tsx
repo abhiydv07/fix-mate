@@ -15,6 +15,7 @@ import {
   PhoneCall,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { BookingChatPanel } from "@/components/BookingChatPanel";
 
 // Dynamic import TrackingMap with ssr: false to prevent window errors during build
 const TrackingMap = dynamic(() => import("@/components/TrackingMap"), {
@@ -269,6 +270,9 @@ export default function OrderTrackingPage({
                 </button>
               </div>
             )}
+
+            {/* Per-Booking Realtime Live Chat Panel */}
+            <BookingChatPanel bookingId={order.id} currentUserId={order.customer_id} />
           </div>
         )}
       </main>
