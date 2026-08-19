@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Header } from "@/components/Header";
+import { MobileNav } from "@/components/MobileNav";
+import { Footer } from "@/components/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,9 +33,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`dark ${inter.variable}`}>
-      <body className="min-h-screen bg-slate-950 text-slate-100 antialiased selection:bg-brand-500 selection:text-white">
-        <div className="mx-auto max-w-md md:max-w-7xl min-h-screen flex flex-col shadow-2xl bg-slate-950 border-x border-slate-900/50">
-          {children}
+      <body className="min-h-screen bg-slate-950 text-slate-100 antialiased selection:bg-brand-500 selection:text-white flex flex-col justify-between">
+        <div className="mx-auto max-w-md md:max-w-7xl w-full min-h-screen flex flex-col shadow-2xl bg-slate-950 border-x border-slate-900/50">
+          <Header />
+          <div className="flex-1">{children}</div>
+          <Footer />
+          <MobileNav />
         </div>
       </body>
     </html>

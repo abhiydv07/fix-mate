@@ -1,45 +1,22 @@
-import Link from "next/link";
-import { Wrench, ShieldCheck, Clock, MapPin, User, Calendar, Zap } from "lucide-react";
+import { ShieldCheck, Clock, MapPin, Zap } from "lucide-react";
 import { SupabaseConnectionStatus } from "@/components/SupabaseConnectionStatus";
 import { ServiceCatalog } from "@/components/ServiceCatalog";
+import { HowItWorks } from "@/components/HowItWorks";
 
 export default function Home() {
-
   return (
     <div className="flex-1 flex flex-col pb-20 md:pb-8">
-      {/* Header / Navbar */}
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/60 px-4 py-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
-            <Wrench className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="font-bold text-lg leading-none bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-              Fix Mate
-            </h1>
-            <p className="text-[10px] text-slate-400 font-medium">Home Services Marketplace</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            Pay on Work
-          </span>
-          <Link
-            href="/login"
-            className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-200 transition-colors"
-          >
-            Sign In
-          </Link>
-        </div>
-      </header>
-
       {/* Hero Section */}
-      <main className="flex-1 px-4 pt-6 space-y-6">
+      <main className="flex-1 px-4 md:px-8 pt-6 space-y-6">
         {/* Location Banner */}
-        <div className="flex items-center gap-2 text-xs text-slate-400 px-1">
-          <MapPin className="w-3.5 h-3.5 text-brand-400" />
-          <span>Delivering to: <strong className="text-slate-200">Indiranagar, Bengaluru</strong></span>
+        <div className="flex items-center justify-between text-xs text-slate-400">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-3.5 h-3.5 text-brand-400" />
+            <span>Delivering to: <strong className="text-slate-200">Indiranagar, Bengaluru</strong></span>
+          </div>
+          <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+            Active Service Zone
+          </span>
         </div>
 
         {/* Supabase Connection Status Badge */}
@@ -67,7 +44,10 @@ export default function Home() {
         {/* Interactive Dynamic Service Catalog */}
         <ServiceCatalog />
 
-        {/* Promo / Banner */}
+        {/* How It Works Section */}
+        <HowItWorks />
+
+        {/* First Time Promo Banner */}
         <div className="p-4 rounded-2xl bg-gradient-to-r from-brand-900/40 to-slate-900 border border-brand-500/30 flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-[10px] uppercase tracking-wider font-bold text-brand-400">First Time Special</span>
@@ -79,22 +59,6 @@ export default function Home() {
           </button>
         </div>
       </main>
-
-      {/* Mobile Sticky Navigation Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-lg border-t border-slate-800/80 px-6 py-2.5 max-w-md mx-auto flex items-center justify-around text-slate-400">
-        <Link href="/" className="flex flex-col items-center gap-1 text-brand-400">
-          <Wrench className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Services</span>
-        </Link>
-        <Link href="/bookings" className="flex flex-col items-center gap-1 hover:text-slate-200 transition-colors">
-          <Calendar className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Bookings</span>
-        </Link>
-        <Link href="/profile" className="flex flex-col items-center gap-1 hover:text-slate-200 transition-colors">
-          <User className="w-5 h-5" />
-          <span className="text-[10px] font-medium">Profile</span>
-        </Link>
-      </nav>
     </div>
   );
 }
