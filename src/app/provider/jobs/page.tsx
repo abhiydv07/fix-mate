@@ -37,6 +37,39 @@ export default function ProviderJobsPage() {
     loadJobs();
   }, []);
 
+  // 30-Second Client-Side Geolocation Broadcaster when status = on_the_way
+  useEffect(() => {
+    const hasOnTheWayJob = jobs.some((j) => j.status === "on_the_way");
+    if (!hasOnTheWayJob) return;
+
+    function sendLocationPing() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            await fetch("/api/provider/location", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              }),
+            });
+            console.log("📡 Provider GPS Broadcaster sent ping:", position.coords.latitude, position.coords.longitude);
+          } catch (err) {
+            console.error("Location ping error:", err);
+          }
+        },
+        (err) => console.warn("GPS ping position error:", err)
+      );
+    }
+
+    sendLocationPing(); // Send immediate ping
+    const timer = setInterval(sendLocationPing, 30000); // Repeat every 30 seconds
+
+    return () => clearInterval(timer);
+  }, [jobs]);
+
   async function loadJobs() {
     setIsLoading(true);
     try {

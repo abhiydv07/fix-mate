@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -14,6 +15,16 @@ import {
   PhoneCall,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+
+// Dynamic import TrackingMap with ssr: false to prevent window errors during build
+const TrackingMap = dynamic(() => import("@/components/TrackingMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-56 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-xs text-slate-500 animate-pulse">
+      Loading OpenStreetMap Realtime Canvas...
+    </div>
+  ),
+});
 
 interface OrderDetail {
   id: string;
@@ -34,6 +45,8 @@ export default function OrderTrackingPage({
   params: { bookingId: string };
 }) {
   const [order, setOrder] = useState<OrderDetail | null>(null);
+  const [providerLat, setProviderLat] = useState<number | null>(null);
+  const [providerLng, setProviderLng] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const supabase = createClient();
@@ -41,8 +54,8 @@ export default function OrderTrackingPage({
   useEffect(() => {
     fetchOrder();
 
-    // Subscribe to Supabase Realtime updates on this specific booking row
-    const channel = supabase
+    // 1. Subscribe to Supabase Realtime updates on this specific booking row
+    const bookingChannel = supabase
       .channel(`booking-${params.bookingId}`)
       .on(
         "postgres_changes",
@@ -60,9 +73,41 @@ export default function OrderTrackingPage({
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(bookingChannel);
     };
   }, [params.bookingId]);
+
+  // 2. Subscribe to Supabase Realtime updates on provider_locations table when provider is assigned
+  useEffect(() => {
+    if (!order?.provider_id) return;
+
+    fetchInitialProviderLocation(order.provider_id);
+
+    const locationChannel = supabase
+      .channel(`provider-location-${order.provider_id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "provider_locations",
+          filter: `provider_id=eq.${order.provider_id}`,
+        },
+        (payload: any) => {
+          const newLoc = payload.new;
+          if (newLoc && newLoc.lat && newLoc.lng) {
+            console.log("⚡ Realtime Provider GPS Update:", newLoc.lat, newLoc.lng);
+            setProviderLat(newLoc.lat);
+            setProviderLng(newLoc.lng);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(locationChannel);
+    };
+  }, [order?.provider_id]);
 
   async function fetchOrder() {
     setIsLoading(true);
@@ -80,6 +125,23 @@ export default function OrderTrackingPage({
       console.error("Fetch order error:", err);
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function fetchInitialProviderLocation(providerId: string) {
+    try {
+      const { data } = await supabase
+        .from("provider_locations")
+        .select("lat, lng")
+        .eq("provider_id", providerId)
+        .single();
+
+      if (data) {
+        setProviderLat(data.lat);
+        setProviderLng(data.lng);
+      }
+    } catch {
+      // Ignore fallback
     }
   }
 
@@ -125,6 +187,14 @@ export default function OrderTrackingPage({
           </div>
         ) : (
           <div className="space-y-6">
+            {/* Live Leaflet Realtime Tracking Map */}
+            <TrackingMap
+              destLat={12.9716}
+              destLng={77.5946}
+              providerLat={providerLat}
+              providerLng={providerLng}
+            />
+
             {/* Status Card */}
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
               <div className="flex items-start justify-between">
@@ -181,7 +251,7 @@ export default function OrderTrackingPage({
               </div>
             </div>
 
-            {/* Provider Info Card (When assigned) */}
+            {/* Provider Info Card */}
             {order.provider_id && (
               <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -199,17 +269,6 @@ export default function OrderTrackingPage({
                 </button>
               </div>
             )}
-
-            {/* Pay on Work Reminder */}
-            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-3">
-              <Zap className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-              <div className="space-y-0.5">
-                <h4 className="text-xs font-bold text-amber-300">Pay on Work Payment</h4>
-                <p className="text-[11px] text-slate-400">
-                  Pay ₹{order.price} cash or UPI directly to your professional after service is completed.
-                </p>
-              </div>
-            </div>
           </div>
         )}
       </main>
