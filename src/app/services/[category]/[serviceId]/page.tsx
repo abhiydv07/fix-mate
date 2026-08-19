@@ -1,15 +1,16 @@
 import Link from "next/link";
-import { ArrowLeft, Clock, ShieldCheck, CheckCircle2, Wrench, Calendar, MapPin, Zap } from "lucide-react";
+import { ArrowLeft, Clock, ShieldCheck, CheckCircle2, Calendar, Zap } from "lucide-react";
 import { fetchServices } from "@/lib/services";
 import { Button } from "@/components/ui/button";
 
-export default async function ServiceDetailPage({
+export default async function CategoryServiceDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: { category: string; serviceId: string };
 }) {
   const allServices = await fetchServices();
-  const service = allServices.find((s) => s.id === params.id) || allServices[0];
+  const service =
+    allServices.find((s) => s.id === params.serviceId) || allServices[0];
 
   const includesList = [
     "Certified & background-verified professional",
@@ -23,10 +24,10 @@ export default async function ServiceDetailPage({
       {/* Header */}
       <header className="flex items-center justify-between py-2 border-b border-slate-800/80">
         <Link
-          href="/"
+          href={`/services/${params.category}`}
           className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-slate-200 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Services
+          <ArrowLeft className="w-4 h-4" /> Back to Category
         </Link>
         <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
           Pay on Work
@@ -40,7 +41,7 @@ export default async function ServiceDetailPage({
           <div className="flex items-start justify-between">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-brand-400">
-                Service Overview
+                Service Package
               </span>
               <h1 className="text-xl font-extrabold text-white mt-0.5">{service.name}</h1>
             </div>

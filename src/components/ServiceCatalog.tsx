@@ -107,7 +107,7 @@ export function ServiceCatalog() {
             {filteredServices.map((service) => (
               <Link
                 key={service.id}
-                href={`/services/${service.id}`}
+                href={`/services/${service.category_id}/${service.id}`}
                 className="group p-4 rounded-2xl bg-slate-900/90 border border-slate-800 hover:border-brand-500/40 transition-all flex flex-col justify-between space-y-3 hover:bg-slate-900"
               >
                 <div className="space-y-1">

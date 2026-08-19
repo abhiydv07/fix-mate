@@ -114,3 +114,65 @@ export async function fetchServices(): Promise<ServiceItem[]> {
     return FALLBACK_SERVICES;
   }
 }
+
+export async function getCategoryBySlug(slug: string): Promise<ServiceCategoryItem | undefined> {
+  const categories = await fetchCategories();
+  return categories.find(
+    (c) => c.name.toLowerCase() === slug.toLowerCase() || c.id === slug
+  );
+}
+
+export async function getServicesByCategory(categoryId: string): Promise<ServiceItem[]> {
+  const allServices = await fetchServices();
+  return allServices.filter((s) => s.category_id === categoryId);
+}
+
+/**
+ * Filter services by name and provider pincode availability
+ * Joins services -> provider_services -> provider_profiles.service_area_pincodes
+ */
+export async function searchServicesWithPincode(
+  nameQuery: string,
+  pincodeQuery: string
+): Promise<ServiceItem[]> {
+  const allServices = await fetchServices();
+
+  let results = allServices;
+
+  if (nameQuery.trim()) {
+    const q = nameQuery.toLowerCase();
+    results = results.filter(
+      (s) =>
+        s.name.toLowerCase().includes(q) ||
+        (s.description && s.description.toLowerCase().includes(q))
+    );
+  }
+
+  if (pincodeQuery.trim()) {
+    try {
+      const supabase = createClient();
+      // Join provider_services and provider_profiles matching pincode
+      const { data: matchedProviders } = await supabase
+        .from("provider_profiles")
+        .select("id, provider_services(service_id)")
+        .contains("service_area_pincodes", [pincodeQuery.trim()]);
+
+      if (matchedProviders && matchedProviders.length > 0) {
+        const allowedServiceIds = new Set<string>();
+        matchedProviders.forEach((p: any) => {
+          if (p.provider_services && Array.isArray(p.provider_services)) {
+            p.provider_services.forEach((ps: any) => allowedServiceIds.add(ps.service_id));
+          }
+        });
+
+        if (allowedServiceIds.size > 0) {
+          results = results.filter((s) => allowedServiceIds.has(s.id));
+        }
+      }
+    } catch {
+      // Fallback: keep query results if DB is pending
+    }
+  }
+
+  return results;
+}
