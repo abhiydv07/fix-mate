@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { BookingChatPanel } from "@/components/BookingChatPanel";
+import { BookingReviewForm } from "@/components/BookingReviewForm";
 
 // Dynamic import TrackingMap with ssr: false to prevent window errors during build
 const TrackingMap = dynamic(() => import("@/components/TrackingMap"), {
@@ -302,6 +303,11 @@ export default function OrderTrackingPage({
                 </button>
               )}
             </div>
+
+            {/* Post-Completion Customer Review Prompt */}
+            {order.status === "completed" && (
+              <BookingReviewForm bookingId={order.id} />
+            )}
           </div>
         )}
       </main>
