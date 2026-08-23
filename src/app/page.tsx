@@ -1,7 +1,10 @@
 import { ShieldCheck, Clock, MapPin, Zap } from "lucide-react";
+import dynamic from "next/dynamic";
 import { SupabaseConnectionStatus } from "@/components/SupabaseConnectionStatus";
-import { ServiceCatalog } from "@/components/ServiceCatalog";
 import { HowItWorks } from "@/components/HowItWorks";
+
+const AiTriageWidget = dynamic(() => import("@/components/AiTriageWidget").then((m) => m.AiTriageWidget), { ssr: false, loading: () => <div className="h-40 rounded-2xl bg-slate-900 animate-pulse" /> });
+const ServiceCatalog = dynamic(() => import("@/components/ServiceCatalog").then((m) => m.ServiceCatalog), { ssr: false, loading: () => <div className="h-64 rounded-2xl bg-slate-900 animate-pulse" /> });
 
 export default function Home() {
   return (
@@ -40,6 +43,9 @@ export default function Home() {
             <span className="text-[9px] text-slate-400">Zero Upfront Cash</span>
           </div>
         </div>
+
+        {/* AI Triage Widget */}
+        <AiTriageWidget />
 
         {/* Interactive Dynamic Service Catalog */}
         <ServiceCatalog />

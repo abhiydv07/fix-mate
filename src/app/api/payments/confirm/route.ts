@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { enforceRateLimit } from "@/lib/rate-limit";
 
 const confirmSchema = z.object({
   bookingId: z.string().min(1, "bookingId is required"),
@@ -9,6 +10,12 @@ const confirmSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 10 per minute per IP
+    const rl = enforceRateLimit(request, "payment-confirm", 10, 60_000);
+    if (!rl.allowed) {
+      return NextResponse.json({ error: "Rate limit exceeded." }, { status: 429, headers: rl.headers });
+    }
+
     const supabase = await createClient();
     const {
       data: { user },
@@ -65,7 +72,7 @@ export async function POST(request: Request) {
       updatedPayment = inserted;
     } else {
       // Update existing payment record
-      const updates: any = {};
+      const updates: { confirmed_by_provider?: boolean; confirmed_by_customer?: boolean; status?: string } = {};
       if (role === "provider") updates.confirmed_by_provider = true;
       if (role === "customer") updates.confirmed_by_customer = true;
 

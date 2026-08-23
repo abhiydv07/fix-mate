@@ -142,7 +142,7 @@ export default function ProviderJobsPage() {
           ].map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
+              onClick={() => setActiveTab(tab.key as "today" | "upcoming" | "history")}
               className={`py-2.5 rounded-xl text-xs font-bold transition-all ${
                 activeTab === tab.key
                   ? "bg-brand-500 text-white shadow-md shadow-brand-500/20"

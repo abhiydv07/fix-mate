@@ -17,6 +17,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { BookingChatPanel } from "@/components/BookingChatPanel";
 import { BookingReviewForm } from "@/components/BookingReviewForm";
+import { DisputeFlagSection } from "@/components/DisputeFlagSection";
 
 // Dynamic import TrackingMap with ssr: false to prevent window errors during build
 const TrackingMap = dynamic(() => import("@/components/TrackingMap"), {
@@ -95,9 +96,9 @@ export default function OrderTrackingPage({
           table: "provider_locations",
           filter: `provider_id=eq.${order.provider_id}`,
         },
-        (payload: any) => {
+        (payload: { new: Record<string, unknown> }) => {
           const newLoc = payload.new;
-          if (newLoc && newLoc.lat && newLoc.lng) {
+          if (newLoc && typeof newLoc.lat === 'number' && typeof newLoc.lng === 'number') {
             console.log("⚡ Realtime Provider GPS Update:", newLoc.lat, newLoc.lng);
             setProviderLat(newLoc.lat);
             setProviderLng(newLoc.lng);
@@ -303,6 +304,11 @@ export default function OrderTrackingPage({
                 </button>
               )}
             </div>
+
+            {/* Dispute Flag Section */}
+            {(order.status === "in_progress" || order.status === "completed") && (
+              <DisputeFlagSection bookingId={order.id} />
+            )}
 
             {/* Post-Completion Customer Review Prompt */}
             {order.status === "completed" && (

@@ -159,9 +159,9 @@ export async function searchServicesWithPincode(
 
       if (matchedProviders && matchedProviders.length > 0) {
         const allowedServiceIds = new Set<string>();
-        matchedProviders.forEach((p: any) => {
+        matchedProviders.forEach((p) => {
           if (p.provider_services && Array.isArray(p.provider_services)) {
-            p.provider_services.forEach((ps: any) => allowedServiceIds.add(ps.service_id));
+            p.provider_services.forEach((ps: { service_id: string }) => allowedServiceIds.add(ps.service_id));
           }
         });
 

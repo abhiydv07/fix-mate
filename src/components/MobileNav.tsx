@@ -14,7 +14,7 @@ export function MobileNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-lg border-t border-slate-800/80 px-6 py-2.5 max-w-md mx-auto flex items-center justify-around md:hidden">
+    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-lg border-t border-slate-800/80 px-6 py-2.5 max-w-md mx-auto flex items-center justify-around md:hidden">
       {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = pathname === item.href;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { enforceRateLimit } from "@/lib/rate-limit";
 
 // Zod Validation Schema for Booking creation
 const bookingSchema = z.object({
@@ -13,6 +14,15 @@ const bookingSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    // Rate limit: 5 bookings per minute per IP
+    const rl = enforceRateLimit(request, "bookings-post", 5, 60_000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Too many booking requests. Please wait a moment." },
+        { status: 429, headers: rl.headers }
+      );
+    }
+
     const supabase = await createClient();
     const {
       data: { user },

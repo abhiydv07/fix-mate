@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Wrench, MapPin, User, LogIn, ShieldCheck, Bell, Check, X } from "lucide-react";
+import { LocaleToggle } from "@/components/LocaleToggle";
 import { getUserNotifications, markNotificationAsRead, NotificationItem } from "@/lib/notifications";
 import { createClient } from "@/lib/supabase/client";
 
@@ -78,7 +79,8 @@ export function Header({ userRole = "customer", userName, avatarUrl }: HeaderPro
       </div>
 
       {/* Right Navigation & Auth Actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        <LocaleToggle />
         <span className="hidden md:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
           <ShieldCheck className="w-3.5 h-3.5" />
           Pay on Work
