@@ -11,8 +11,10 @@ import {
   Play,
   Check,
   Calendar,
+  Camera,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CompletionPhotoUpload } from "@/components/CompletionPhotoUpload";
 
 interface JobItem {
   id: string;
@@ -233,13 +235,20 @@ export default function ProviderJobsPage() {
                     )}
 
                     {job.status === "in_progress" && (
-                      <Button
-                        onClick={() => handleUpdateStatus(job.id, "completed")}
-                        disabled={updatingId === job.id}
-                        className="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-bold py-2.5 flex items-center justify-center gap-1.5"
-                      >
-                        <Check className="w-3.5 h-3.5" /> Mark Completed & Collect ₹{job.price}
-                      </Button>
+                      <div className="w-full space-y-3">
+                        <CompletionPhotoUpload
+                          bookingId={job.id}
+                          onComplete={() => handleUpdateStatus(job.id, "completed")}
+                        />
+                        <Button
+                          onClick={() => handleUpdateStatus(job.id, "completed")}
+                          disabled={updatingId === job.id}
+                          variant="outline"
+                          className="w-full border-slate-700 text-slate-300 text-xs font-bold py-2.5 flex items-center justify-center gap-1.5"
+                        >
+                          <Check className="w-3.5 h-3.5" /> Skip Photos & Mark Complete
+                        </Button>
+                      </div>
                     )}
 
                     {job.status === "completed" && (

@@ -46,8 +46,12 @@ export function Footer() {
           {/* Contact & Support */}
           <div className="space-y-2">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">Support</h4>
-            <p className="text-xs text-slate-400">Questions or need emergency booking help?</p>
-            <p className="text-xs font-semibold text-brand-400">support@fixmate.in</p>
+            <ul className="space-y-1.5 text-xs">
+              <li><Link href="/help" className="hover:text-brand-400 transition-colors">Help & FAQ</Link></li>
+              <li><Link href="/bookings" className="hover:text-brand-400 transition-colors">My Bookings</Link></li>
+              <li><Link href="/profile" className="hover:text-brand-400 transition-colors">My Account</Link></li>
+              <li><a href="mailto:support@fixmate.in" className="hover:text-brand-400 transition-colors">Contact Us</a></li>
+            </ul>
           </div>
         </div>
 

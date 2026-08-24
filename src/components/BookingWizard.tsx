@@ -18,6 +18,7 @@ import { ServiceItem } from "@/lib/services";
 import { getUserAddresses, AddressItem } from "@/lib/addresses";
 import { createBooking } from "@/lib/bookings";
 import { Button } from "@/components/ui/button";
+import { ServicePackages, defaultPackages } from "@/components/ServicePackages";
 
 interface BookingWizardProps {
   service: ServiceItem;
@@ -25,7 +26,18 @@ interface BookingWizardProps {
 
 export function BookingWizard({ service }: BookingWizardProps) {
   const router = useRouter();
-  const [step, setStep] = useState<number>(1);
+  const [step, setStep] = useState<number>(0);
+
+  // Step 0: Package Selection
+  const [selectedPackageId, setSelectedPackageId] = useState<string>("basic");
+  const servicePackages = defaultPackages["plumbing"] || [];
+  const activePackages = servicePackages.length > 0 ? servicePackages : [
+    { id: "basic", name: "Basic", tagline: "Standard service", price: service.base_price, features: ["Standard service", "30-day warranty"], icon: "basic" as const },
+    { id: "standard", name: "Standard", tagline: "Most chosen", price: Math.round(service.base_price * 1.5), originalPrice: Math.round(service.base_price * 1.8), features: ["Extended service", "60-day warranty", "Quality parts"], icon: "standard" as const, popular: true },
+    { id: "premium", name: "Premium", tagline: "Full coverage", price: Math.round(service.base_price * 2.5), features: ["Complete service", "90-day warranty", "Priority support"], icon: "premium" as const },
+  ];
+  const activePackage = activePackages.find((p) => p.id === selectedPackageId) || activePackages[0];
+  const servicePrice = activePackage?.price || service.base_price;
 
   // Step 1: Date & Time Slot State
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -102,7 +114,7 @@ export function BookingWizard({ service }: BookingWizardProps) {
 
   const convenienceFee = 49;
   const discountAmount = appliedCoupon ? appliedCoupon.discount : 0;
-  const totalPrice = Math.max(0, service.base_price + convenienceFee - discountAmount);
+  const totalPrice = Math.max(0, servicePrice + convenienceFee - discountAmount);
 
   const handleApplyCoupon = () => {
     setCouponError("");
@@ -128,7 +140,7 @@ export function BookingWizard({ service }: BookingWizardProps) {
     setIsSubmitting(true);
     setErrorMsg("");
 
-    const scheduledTimestamp = `${selectedDate}T${convertSlotTo24H(selectedTimeSlot)}:00Z`;
+    const scheduledTimestamp = `${selectedDate}T${convertSlotTo24H(selectedTimeSlot)}:00.000Z`;
 
     const result = await createBooking({
       service_id: service.id,
@@ -137,7 +149,7 @@ export function BookingWizard({ service }: BookingWizardProps) {
       price: totalPrice,
       notes: notes,
       couponCode: appliedCoupon?.code,
-    });
+    } as any);
 
     setIsSubmitting(false);
 
@@ -198,7 +210,7 @@ export function BookingWizard({ service }: BookingWizardProps) {
     <div className="max-w-xl mx-auto w-full space-y-6">
       {/* Wizard Progress Bar */}
       <div className="flex items-center justify-between px-2">
-        {[1, 2, 3, 4].map((s) => (
+        {[0, 1, 2, 3, 4].map((s) => (
           <div key={s} className="flex items-center gap-1">
             <div
               className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
@@ -209,16 +221,36 @@ export function BookingWizard({ service }: BookingWizardProps) {
                   : "bg-slate-900 text-slate-500 border border-slate-800"
               }`}
             >
-              {step > s ? "✓" : s}
+              {step > s ? "✓" : s + 1}
             </div>
             <span className="text-[10px] font-semibold text-slate-400 hidden sm:inline">
-              {s === 1 ? "Schedule" : s === 2 ? "Address" : s === 3 ? "Notes" : "Review"}
+              {s === 0 ? "Package" : s === 1 ? "Schedule" : s === 2 ? "Address" : s === 3 ? "Notes" : "Review"}
             </span>
           </div>
         ))}
       </div>
 
-      {/* STEP 1: Date & Time Slot */}
+      {/* STEP 0: Package Selection */}
+      {step === 0 && (
+        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-5 shadow-lg">
+          <div className="space-y-1">
+            <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-brand-400" /> Choose Service Package
+            </h3>
+            <p className="text-xs text-slate-400">Select the level of service you need.</p>
+          </div>
+          <ServicePackages
+            packages={activePackages}
+            selectedPackageId={selectedPackageId}
+            onSelect={setSelectedPackageId}
+          />
+          <Button onClick={() => setStep(1)} className="w-full py-3 text-xs font-bold flex items-center justify-center gap-2">
+            Continue to Schedule <ArrowRight className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
+
+
       {step === 1 && (
         <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-5 shadow-lg">
           <div className="space-y-1">
@@ -277,9 +309,7 @@ export function BookingWizard({ service }: BookingWizardProps) {
                 );
               })}
             </div>
-          </div>
-
-          <Button onClick={() => setStep(2)} className="w-full py-3 text-xs font-bold flex items-center justify-center gap-2">
+          </div>          <Button onClick={() => setStep(2)} className="w-full py-3 text-xs font-bold flex items-center justify-center gap-2">
             Continue to Delivery Address <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
@@ -429,7 +459,11 @@ export function BookingWizard({ service }: BookingWizardProps) {
 
             <div className="space-y-1.5 text-slate-300 text-[11px]">
               <div className="flex justify-between">
-                <span>Scheduled Slot:</span>
+                <span>Package:</span>
+                <strong className="text-slate-200">{activePackage?.name || "Basic"}</strong>
+              </div>
+              <div className="flex justify-between">
+              <span>Scheduled Slot:</span>
                 <strong className="text-slate-100">{selectedDate} @ {selectedTimeSlot}</strong>
               </div>
               <div className="flex justify-between">
@@ -446,8 +480,8 @@ export function BookingWizard({ service }: BookingWizardProps) {
 
             <div className="pt-2 border-t border-slate-800/80 space-y-1 text-slate-300">
               <div className="flex justify-between text-[11px]">
-                <span>Base Service Charge:</span>
-                <span>₹{service.base_price}</span>
+                <span>Base Service ({activePackage?.name || "Basic"}):</span>
+                <span>₹{servicePrice}</span>
               </div>
               <div className="flex justify-between text-[11px]">
                 <span>Safety & Convenience Fee:</span>

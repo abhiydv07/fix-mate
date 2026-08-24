@@ -18,6 +18,7 @@ import { createClient } from "@/lib/supabase/client";
 import { BookingChatPanel } from "@/components/BookingChatPanel";
 import { BookingReviewForm } from "@/components/BookingReviewForm";
 import { DisputeFlagSection } from "@/components/DisputeFlagSection";
+import { BookingActions } from "@/components/BookingActions";
 
 // Dynamic import TrackingMap with ssr: false to prevent window errors during build
 const TrackingMap = dynamic(() => import("@/components/TrackingMap"), {
@@ -304,6 +305,13 @@ export default function OrderTrackingPage({
                 </button>
               )}
             </div>
+
+            {/* Booking Actions - Cancel / Reschedule / Rebook */}
+            <BookingActions
+              bookingId={order.id}
+              status={order.status}
+              scheduledAt={order.scheduled_at}
+            />
 
             {/* Dispute Flag Section */}
             {(order.status === "in_progress" || order.status === "completed") && (

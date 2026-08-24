@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Briefcase, UserCheck, Settings, ShieldCheck, Wrench } from "lucide-react";
+import {
+  LayoutDashboard, Briefcase, UserCheck, Settings, ShieldCheck, Wrench,
+  Wallet, Calendar, Star, Bell, HelpCircle, LogOut
+} from "lucide-react";
 
 interface ProviderSidebarProps {
   role?: "provider" | "admin";
@@ -12,10 +15,13 @@ export function ProviderSidebar({ role = "provider" }: ProviderSidebarProps) {
   const pathname = usePathname();
 
   const links = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/dashboard/jobs", label: "Active Jobs", icon: Briefcase },
-    { href: "/dashboard/services", label: "My Services", icon: Wrench },
-    { href: "/profile", label: "Account Profile", icon: UserCheck },
+    { href: "/provider/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/provider/jobs", label: "My Jobs", icon: Briefcase },
+    { href: "/provider/requests", label: "Job Requests", icon: Bell },
+    { href: "/provider/earnings", label: "Earnings", icon: Wallet },
+    { href: "/provider/availability", label: "Availability", icon: Calendar },
+    { href: "/provider/dashboard", label: "My Reviews", icon: Star },
+    { href: "/account", label: "Profile & Settings", icon: UserCheck },
   ];
 
   return (
@@ -55,9 +61,14 @@ export function ProviderSidebar({ role = "provider" }: ProviderSidebarProps) {
         </nav>
       </div>
 
-      <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1 text-slate-400 text-[11px]">
-        <p className="font-bold text-slate-300">Pay on Work Guarantee</p>
-        <p>Collect cash/UPI payments directly from customer upon job completion.</p>
+      <div className="space-y-2">
+        <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1 text-slate-400 text-[11px]">
+          <p className="font-bold text-slate-300">Pay on Work</p>
+          <p>Collect payment directly from customer after job completion.</p>
+        </div>
+        <Link href="/" className="flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all">
+          <LogOut className="w-3.5 h-3.5" /> Back to Main Site
+        </Link>
       </div>
     </aside>
   );

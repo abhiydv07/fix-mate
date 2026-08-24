@@ -3,23 +3,40 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Wrench, MapPin, User, LogIn, ShieldCheck, Bell, Check, X } from "lucide-react";
+import { Wrench, MapPin, LogIn, LogOut, ShieldCheck, Bell, Check, X } from "lucide-react";
 import { LocaleToggle } from "@/components/LocaleToggle";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { getUserNotifications, markNotificationAsRead, NotificationItem } from "@/lib/notifications";
 import { createClient } from "@/lib/supabase/client";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
-interface HeaderProps {
-  userRole?: string;
-  userName?: string;
-  avatarUrl?: string;
-}
-
-export function Header({ userRole = "customer", userName, avatarUrl }: HeaderProps) {
+export function Header() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [userName, setUserName] = useState<string>("");
+  const [userRole, setUserRole] = useState<string>("customer");
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
   const supabase = createClient();
 
   useEffect(() => {
+    async function loadUser() {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setUser(authUser);
+      if (authUser) {
+        const name = authUser.user_metadata?.full_name || authUser.user_metadata?.name || authUser.email?.split("@")[0] || "";
+        setUserName(name);
+        setAvatarUrl(authUser.user_metadata?.avatar_url || "");
+        // Fetch role from profiles table
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", authUser.id)
+          .single();
+        if (profile) setUserRole(profile.role || "customer");
+      }
+    }
+    loadUser();
     loadNotifications();
 
     // Subscribe to Supabase Realtime updates on notifications table
@@ -58,7 +75,7 @@ export function Header({ userRole = "customer", userName, avatarUrl }: HeaderPro
   };
 
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-xl bg-slate-950/90 border-b border-slate-800/80 px-4 md:px-8 py-3.5 flex items-center justify-between">
+    <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/90 dark:bg-slate-950/90 border-b border-slate-200 dark:border-slate-800/80 px-4 md:px-8 py-3.5 flex items-center justify-between">
       {/* Brand Logo */}
       <Link href="/" className="flex items-center gap-2.5 group">
         <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
@@ -81,6 +98,7 @@ export function Header({ userRole = "customer", userName, avatarUrl }: HeaderPro
       {/* Right Navigation & Auth Actions */}
       <div className="flex items-center gap-2">
         <LocaleToggle />
+        <ThemeToggle />
         <span className="hidden md:inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
           <ShieldCheck className="w-3.5 h-3.5" />
           Pay on Work
@@ -141,19 +159,28 @@ export function Header({ userRole = "customer", userName, avatarUrl }: HeaderPro
         </div>
 
         {userName ? (
-          <Link
-            href={userRole === "provider" || userRole === "admin" ? "/dashboard" : "/profile"}
-            className="flex items-center gap-2 p-1.5 pr-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors"
-          >
-            {avatarUrl ? (
-              <Image src={avatarUrl} alt={userName} width={24} height={24} className="w-6 h-6 rounded-lg object-cover" />
-            ) : (
-              <div className="w-6 h-6 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs font-bold">
-                {userName.charAt(0).toUpperCase()}
-              </div>
-            )}
-            <span className="text-xs font-semibold text-slate-200 hidden sm:inline">{userName}</span>
-          </Link>
+          <div className="flex items-center gap-1">
+            <Link
+              href={userRole === "provider" || userRole === "admin" ? "/provider/dashboard" : "/account"}
+              className="flex items-center gap-2 p-1.5 pr-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors"
+            >
+              {avatarUrl ? (
+                <Image src={avatarUrl} alt={userName} width={24} height={24} className="w-6 h-6 rounded-lg object-cover" />
+              ) : (
+                <div className="w-6 h-6 rounded-lg bg-brand-500/20 text-brand-400 flex items-center justify-center text-xs font-bold">
+                  {userName.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <span className="text-xs font-semibold text-slate-200 hidden sm:inline">{userName}</span>
+            </Link>
+            <button
+              onClick={async () => { await supabase.auth.signOut(); window.location.href = "/"; }}
+              className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-rose-400 hover:border-rose-500/30 transition-colors"
+              title="Sign out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         ) : (
           <Link
             href="/login"
