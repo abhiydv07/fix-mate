@@ -19,6 +19,8 @@ import { BookingChatPanel } from "@/components/BookingChatPanel";
 import { BookingReviewForm } from "@/components/BookingReviewForm";
 import { DisputeFlagSection } from "@/components/DisputeFlagSection";
 import { BookingActions } from "@/components/BookingActions";
+import { InvoiceGenerator } from "@/components/InvoiceGenerator";
+import { WarrantyClaimForm } from "@/components/WarrantyClaimForm";
 
 // Dynamic import TrackingMap with ssr: false to prevent window errors during build
 const TrackingMap = dynamic(() => import("@/components/TrackingMap"), {
@@ -316,6 +318,32 @@ export default function OrderTrackingPage({
             {/* Dispute Flag Section */}
             {(order.status === "in_progress" || order.status === "completed") && (
               <DisputeFlagSection bookingId={order.id} />
+            )}
+
+            {/* Invoice Download */}
+            {order.status === "completed" && (
+              <InvoiceGenerator
+                invoice={{
+                  bookingId: order.id,
+                  serviceName: "Service Booking",
+                  serviceDate: order.scheduled_at,
+                  amount: order.price - 49,
+                  convenienceFee: 49,
+                  gst: Math.round((order.price - 49) * 0.18),
+                  total: order.price + Math.round((order.price - 49) * 0.18),
+                  customerName: "Customer",
+                }}
+              />
+            )}
+
+            {/* Warranty Claim */}
+            {order.status === "completed" && (
+              <WarrantyClaimForm
+                bookingId={order.id}
+                serviceName="Service Booking"
+                serviceDate={order.scheduled_at}
+                warrantyDays={30}
+              />
             )}
 
             {/* Post-Completion Customer Review Prompt */}

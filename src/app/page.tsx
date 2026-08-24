@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import { StarRating } from "@/components/StarRating";
 
 const AiTriageWidget = dynamic(() => import("@/components/AiTriageWidget").then((m) => m.AiTriageWidget), { ssr: false, loading: () => <div className="h-40 rounded-2xl bg-slate-900 animate-pulse" /> });
+import { BookingReminder } from "@/components/BookingReminder";
 
 interface Service {
   id: string;
@@ -116,6 +117,9 @@ export default function Home() {
             <span className="text-[9px] text-slate-400">Zero Upfront Cash</span>
           </div>
         </div>
+
+        {/* Booking Reminders */}
+        <BookingReminder />
 
         {/* Emergency Booking Banner */}
         <Link href="/services" className="block p-4 rounded-2xl bg-gradient-to-r from-rose-900/20 to-slate-900 border border-rose-500/20 hover:border-rose-500/30 transition-all">

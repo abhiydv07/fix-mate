@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { enforceRateLimit } from "@/lib/rate-limit";
 
 const postMessageSchema = z.object({
   bookingId: z.string().min(1, "bookingId is required"),
@@ -9,6 +10,10 @@ const postMessageSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const rl = enforceRateLimit(request, "chat-post", 30, 60_000);
+    if (!rl.allowed) {
+      return NextResponse.json({ error: "Too many messages" }, { status: 429, headers: rl.headers });
+    }
     const supabase = await createClient();
     const {
       data: { user },
