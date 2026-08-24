@@ -60,6 +60,29 @@ export default function WalletPage() {
 
   const quickAmounts = [100, 200, 500, 1000];
 
+  async function handleAddMoney() {
+    const amt = parseInt(addAmount);
+    if (!amt || amt < 10) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Record as a wallet credit
+    await supabase.from("notifications").insert({
+      user_id: user.id,
+      title: `₹${amt} Added to Wallet`,
+      body: `Your wallet has been credited with ₹${amt} via UPI.`,
+    });
+
+    // Add credit transaction to the list
+    setTransactions((prev) => [
+      { id: `wallet-${Date.now()}`, type: "credit" as const, amount: amt, description: "Wallet top-up via UPI", date: new Date().toISOString() },
+      ...prev,
+    ]);
+    setBalance((prev) => prev + amt);
+    setAddAmount("");
+    setShowAddMoney(false);
+  }
+
   return (
     <div className="min-h-screen flex flex-col p-4 md:p-8 bg-slate-950 text-slate-100 pb-20 md:pb-8">
       <header className="flex items-center justify-between py-2 border-b border-slate-800/80 mb-6">
@@ -113,7 +136,7 @@ export default function WalletPage() {
                   type="number"
                   className="flex-1 px-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none"
                 />
-                <button className="px-4 py-2.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold">Add</button>
+                <button onClick={handleAddMoney} className="px-4 py-2.5 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold">Add</button>
               </div>
               <p className="text-[9px] text-slate-500">UPI, Cards, Net Banking accepted</p>
             </div>

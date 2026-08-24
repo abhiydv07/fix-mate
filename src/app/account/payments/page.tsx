@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, CreditCard, Smartphone, Banknote, Plus, Check, Trash2, Shield } from "lucide-react";
+import { createClient } from "@/lib/supabase/client"
 
 interface PaymentMethod {
   id: string;
@@ -18,22 +19,50 @@ export default function PaymentMethodsPage() {
   ]);
   const [showAddUPI, setShowAddUPI] = useState(false);
   const [upiId, setUpiId] = useState("");
+  const supabase = createClient();
 
-  function addUPI() {
+  useEffect(() => { loadMethods(); }, []);
+
+  async function loadMethods() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase.from("payment_methods").select("*").eq("user_id", user.id);
+    if (data && data.length > 0) {
+      setMethods([
+        { id: "cash", type: "cash", label: "Cash on Service", detail: "Pay cash after work is done", isDefault: data.every((m: any) => !m.is_default) },
+        ...data.map((m: any) => ({ id: m.id, type: m.type as "upi" | "card", label: m.type.toUpperCase(), detail: m.upi_id || m.card_last4 || "", isDefault: m.is_default })),
+      ]);
+    }
+  }
+
+  async function addUPI() {
     if (!upiId) return;
-    setMethods((prev) => [
-      ...prev.map((m) => ({ ...m, isDefault: false })),
-      { id: Date.now().toString(), type: "upi", label: "UPI", detail: upiId, isDefault: true },
-    ]);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data, error } = await supabase.from("payment_methods").insert({
+      user_id: user.id, type: "upi", upi_id: upiId, is_default: true,
+    }).select().single();
+    if (!error && data) {
+      setMethods((prev) => [
+        ...prev.map((m) => ({ ...m, isDefault: false })),
+        { id: data.id, type: "upi", label: "UPI", detail: upiId, isDefault: true },
+      ]);
+    }
     setUpiId("");
     setShowAddUPI(false);
   }
 
-  function setDefault(id: string) {
+  async function setDefault(id: string) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.from("payment_methods").update({ is_default: false }).eq("user_id", user.id);
+      await supabase.from("payment_methods").update({ is_default: true }).eq("id", id);
+    }
     setMethods((prev) => prev.map((m) => ({ ...m, isDefault: m.id === id })));
   }
 
-  function removeMethod(id: string) {
+  async function removeMethod(id: string) {
+    await supabase.from("payment_methods").delete().eq("id", id);
     setMethods((prev) => prev.filter((m) => m.id !== id));
   }
 

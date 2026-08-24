@@ -6,6 +6,7 @@ import { ShieldCheck, Clock, MapPin, Zap, Star, ArrowRight, TrendingUp, Gift, Ch
 import { createClient } from "@/lib/supabase/client";
 import dynamic from "next/dynamic";
 import { StarRating } from "@/components/StarRating";
+import { useI18n } from "@/lib/i18n";
 
 const AiTriageWidget = dynamic(() => import("@/components/AiTriageWidget").then((m) => m.AiTriageWidget), { ssr: false, loading: () => <div className="h-40 rounded-2xl bg-slate-900 animate-pulse" /> });
 import { BookingReminder } from "@/components/BookingReminder";
@@ -26,6 +27,7 @@ interface Category {
 }
 
 export default function Home() {
+  const { t } = useI18n();
   const [services, setServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -103,18 +105,18 @@ export default function Home() {
         <div className="grid grid-cols-3 gap-2.5">
           <div className="p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80 flex flex-col items-center text-center space-y-1">
             <ShieldCheck className="w-5 h-5 text-brand-400" />
-            <span className="text-[11px] font-semibold text-slate-200">Verified Pros</span>
-            <span className="text-[9px] text-slate-400">Background Checked</span>
+            <span className="text-[11px] font-semibold text-slate-200">{t("hero.verifiedPros")}</span>
+            <span className="text-[9px] text-slate-400">{t("hero.backgroundChecked")}</span>
           </div>
           <div className="p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80 flex flex-col items-center text-center space-y-1">
             <Zap className="w-5 h-5 text-amber-400" />
-            <span className="text-[11px] font-semibold text-slate-200">30 Min Arrival</span>
-            <span className="text-[9px] text-slate-400">Instant Booking</span>
+            <span className="text-[11px] font-semibold text-slate-200">{t("hero.arrival")}</span>
+            <span className="text-[9px] text-slate-400">{t("hero.instantBooking")}</span>
           </div>
           <div className="p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80 flex flex-col items-center text-center space-y-1">
             <Clock className="w-5 h-5 text-emerald-400" />
-            <span className="text-[11px] font-semibold text-slate-200">Pay After Work</span>
-            <span className="text-[9px] text-slate-400">Zero Upfront Cash</span>
+            <span className="text-[11px] font-semibold text-slate-200">{t("hero.payAfter")}</span>
+            <span className="text-[9px] text-slate-400">{t("hero.zeroUpfront")}</span>
           </div>
         </div>
 

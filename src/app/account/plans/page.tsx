@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, Crown, Zap, ShieldCheck, Star, Clock, Percent, Headphones, ChevronRight } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 const plans = [
   {
@@ -71,8 +73,38 @@ const plans = [
 ];
 
 export default function PlansPage() {
-  const [currentPlan] = useState("free");
+  const router = useRouter();
+  const [currentPlan, setCurrentPlan] = useState("free");
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [isUpgrading, setIsUpgrading] = useState(false);
+  const supabase = createClient();
+
+  async function handleUpgrade(planId: string) {
+    setIsUpgrading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { router.push("/login"); return; }
+
+    // Store subscription in user metadata
+    await supabase.auth.updateUser({
+      data: { subscription_plan: planId },
+    });
+
+    await supabase.from("profiles").upsert({
+      id: user.id,
+      subscription_plan: planId,
+    }, { onConflict: "id" });
+
+    await supabase.from("notifications").insert({
+      user_id: user.id,
+      title: "Plan Upgraded! 🎉",
+      body: `You are now on Fix Mate ${planId === "plus" ? "Plus" : "Plus Annual"}. Enjoy premium benefits!`,
+    });
+
+    setCurrentPlan(planId);
+    setSelectedPlan(null);
+    setIsUpgrading(false);
+    alert(`Successfully upgraded to ${planId === "plus" ? "Fix Mate Plus" : "Fix Mate Plus Annual"}!`);
+  }
 
   return (
     <div className="min-h-screen flex flex-col p-4 md:p-8 bg-slate-950 text-slate-100 pb-20 md:pb-8">
@@ -150,14 +182,15 @@ export default function PlansPage() {
                 </div>
               ) : plan.id === "free" ? null : (
                 <button
-                  onClick={() => setSelectedPlan(plan.id)}
+                  onClick={() => handleUpgrade(plan.id)}
+                  disabled={isUpgrading}
                   className={`w-full py-2.5 rounded-xl text-xs font-bold transition-all ${
                     plan.popular
                       ? "bg-amber-500 hover:bg-amber-600 text-slate-950"
                       : "bg-brand-500 hover:bg-brand-600 text-white"
-                  }`}
+                  } disabled:opacity-50`}
                 >
-                  Get {plan.name} →
+                  {isUpgrading ? "Upgrading..." : `Get ${plan.name} →`}
                 </button>
               )}
             </div>
