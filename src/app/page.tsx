@@ -58,10 +58,10 @@ export default function Home() {
         <div className="flex items-center justify-between text-xs text-slate-400">
           <div className="flex items-center gap-2">
             <MapPin className="w-3.5 h-3.5 text-brand-400" />
-            <span>Delivering to: <strong className="text-slate-200">Indiranagar, Bengaluru</strong></span>
+            <span>{t("hero.location")}: <strong className="text-slate-200">Indiranagar, Bengaluru</strong></span>
           </div>
           <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-            Active Service Zone
+            {t("hero.activeZone")}
           </span>
         </div>
 
@@ -72,7 +72,7 @@ export default function Home() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="What do you need help with?"
+            placeholder={t("home.searchPlaceholder")}
             className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-900 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 shadow-lg"
           />
           {searchQuery && filteredServices.length > 0 && (
@@ -130,11 +130,11 @@ export default function Home() {
               <Zap className="w-5 h-5 text-rose-400" />
             </div>
             <div className="flex-1">
-              <h4 className="text-xs font-bold text-white">Need Urgent Help?</h4>
-              <p className="text-[10px] text-slate-400">Get a professional at your doorstep in 30 minutes</p>
+              <h4 className="text-xs font-bold text-white">{t("home.urgentHelp")}</h4>
+              <p className="text-[10px] text-slate-400">{t("home.urgentDesc")}</p>
             </div>
             <span className="text-[10px] font-bold text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-full border border-rose-500/20">
-              Emergency →
+              {t("home.emergency")}
             </span>
           </div>
         </Link>
@@ -146,9 +146,9 @@ export default function Home() {
         {categories.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-extrabold text-white">Browse by Category</h2>
+              <h2 className="text-sm font-extrabold text-white">{t("home.browseCategory")}</h2>
               <Link href="/services" className="text-[10px] text-brand-400 font-semibold hover:underline flex items-center gap-0.5">
-                View All <ArrowRight className="w-3 h-3" />
+                {t("home.viewAll")} <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
@@ -170,37 +170,37 @@ export default function Home() {
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Gift className="w-4 h-4 text-amber-400" />
-            <h2 className="text-sm font-extrabold text-white">Offers for You</h2>
+            <h2 className="text-sm font-extrabold text-white">{t("home.offersForYou")}</h2>
           </div>
           <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
             <div className="shrink-0 w-64 p-4 rounded-2xl bg-gradient-to-br from-brand-900/40 to-slate-900 border border-brand-500/30 space-y-2">
               <div className="flex items-center gap-1.5">
                 <Percent className="w-4 h-4 text-brand-400" />
-                <span className="text-[10px] font-bold text-brand-400">FIRST TIME</span>
+                <span className="text-[10px] font-bold text-brand-400">{t("home.firstTime")}</span>
               </div>
-              <h4 className="text-sm font-bold text-white">Flat ₹150 OFF</h4>
-              <p className="text-[10px] text-slate-400">On your first service booking</p>
+              <h4 className="text-sm font-bold text-white">{t("home.flat150Off")}</h4>
+              <p className="text-[10px] text-slate-400">{t("home.firstBookingDesc")}</p>
               <div className="flex items-center justify-between">
                 <code className="text-[11px] font-mono font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded">FIXFIRST150</code>
-                <button className="text-[10px] font-bold text-brand-400 hover:underline">Claim →</button>
+                <button className="text-[10px] font-bold text-brand-400 hover:underline">{t("home.claim")}</button>
               </div>
             </div>
             <div className="shrink-0 w-64 p-4 rounded-2xl bg-gradient-to-br from-emerald-900/30 to-slate-900 border border-emerald-500/20 space-y-2">
               <div className="flex items-center gap-1.5">
                 <Gift className="w-4 h-4 text-emerald-400" />
-                <span className="text-[10px] font-bold text-emerald-400">REFER & EARN</span>
+                <span className="text-[10px] font-bold text-emerald-400">{t("home.referEarn")}</span>
               </div>
-              <h4 className="text-sm font-bold text-white">Invite Friends, Get ₹100</h4>
-              <p className="text-[10px] text-slate-400">Both you and your friend get ₹100 credit</p>
-              <button className="text-[10px] font-bold text-emerald-400 hover:underline">Share Link →</button>
+              <h4 className="text-sm font-bold text-white">{t("home.inviteFriends")}</h4>
+              <p className="text-[10px] text-slate-400">{t("home.referralDesc")}</p>
+              <button className="text-[10px] font-bold text-emerald-400 hover:underline">{t("home.shareLink")}</button>
             </div>
             <div className="shrink-0 w-64 p-4 rounded-2xl bg-gradient-to-br from-amber-900/30 to-slate-900 border border-amber-500/20 space-y-2">
               <div className="flex items-center gap-1.5">
                 <Zap className="w-4 h-4 text-amber-400" />
-                <span className="text-[10px] font-bold text-amber-400">WEEKEND DEAL</span>
+                <span className="text-[10px] font-bold text-amber-400">{t("home.weekendDeal")}</span>
               </div>
-              <h4 className="text-sm font-bold text-white">20% OFF Cleaning</h4>
-              <p className="text-[10px] text-slate-400">Valid on Sat & Sun only</p>
+              <h4 className="text-sm font-bold text-white">{t("home.cleaning20Off")}</h4>
+              <p className="text-[10px] text-slate-400">{t("home.weekendDesc")}</p>
               <code className="text-[11px] font-mono font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded inline-block">CLEAN20</code>
             </div>
           </div>
@@ -212,10 +212,10 @@ export default function Home() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-amber-400" />
-                <h2 className="text-sm font-extrabold text-white">Trending Services</h2>
+                <h2 className="text-sm font-extrabold text-white">{t("home.trending")}</h2>
               </div>
               <Link href="/services" className="text-[10px] text-brand-400 font-semibold hover:underline flex items-center gap-0.5">
-                View All <ArrowRight className="w-3 h-3" />
+                {t("home.viewAll")} <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -245,13 +245,13 @@ export default function Home() {
 
         {/* Why Fix Mate - Trust Section */}
         <div className="space-y-3">
-          <h2 className="text-sm font-extrabold text-white text-center">Why Customers Trust Fix Mate</h2>
+          <h2 className="text-sm font-extrabold text-white text-center">{t("home.whyTrust")}</h2>
           <div className="grid grid-cols-2 gap-2">
             {[
-              { icon: ShieldCheck, title: "Verified Professionals", desc: "Background checked & certified", color: "text-brand-400" },
-              { icon: Clock, title: "Quick Response", desc: "30 min average arrival time", color: "text-amber-400" },
-              { icon: Star, title: "Quality Guaranteed", desc: "30-day service warranty", color: "text-emerald-400" },
-              { icon: Zap, title: "Transparent Pricing", desc: "No hidden charges ever", color: "text-rose-400" },
+              { icon: ShieldCheck, title: t("home.verifiedProsTitle"), desc: t("home.verifiedProsDesc"), color: "text-brand-400" },
+              { icon: Clock, title: t("home.quickResponse"), desc: t("home.quickResponseDesc"), color: "text-amber-400" },
+              { icon: Star, title: t("home.qualityGuarantee"), desc: t("home.qualityGuaranteeDesc"), color: "text-emerald-400" },
+              { icon: Zap, title: t("home.transparentPricing"), desc: t("home.transparentPricingDesc"), color: "text-rose-400" },
             ].map((item) => (
               <div key={item.title} className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1.5">
                 <item.icon className={`w-5 h-5 ${item.color}`} />
@@ -264,13 +264,13 @@ export default function Home() {
 
         {/* How It Works */}
         <div className="space-y-4">
-          <h2 className="text-sm font-extrabold text-white text-center">How It Works</h2>
+          <h2 className="text-sm font-extrabold text-white text-center">{t("home.howItWorks")}</h2>
           <div className="flex items-start gap-3">
             {[
-              { step: "1", title: "Choose Service", desc: "Browse categories or search for what you need" },
-              { step: "2", title: "Pick Time & Address", desc: "Select a convenient date, time, and location" },
-              { step: "3", title: "Get a Pro", desc: "A verified professional is assigned instantly" },
-              { step: "4", title: "Pay After Work", desc: "Cash or UPI after service completion" },
+              { step: "1", title: t("home.step1Title"), desc: t("home.step1Desc") },
+              { step: "2", title: t("home.step2Title"), desc: t("home.step2Desc") },
+              { step: "3", title: t("home.step3Title"), desc: t("home.step3Desc") },
+              { step: "4", title: t("home.step4Title"), desc: t("home.step4Desc") },
             ].map((item, idx) => (
               <div key={idx} className="flex-1 text-center space-y-2 relative">
                 <div className="w-8 h-8 rounded-full bg-brand-500 text-white font-bold text-sm flex items-center justify-center mx-auto shadow-lg shadow-brand-500/20">
@@ -287,7 +287,7 @@ export default function Home() {
         {/* Service Catalog */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-extrabold text-white">All Services</h2>
+            <h2 className="text-sm font-extrabold text-white">{t("home.allServices")}</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {services.map((s) => {
@@ -312,8 +312,8 @@ export default function Home() {
 
         {/* Download App Banner */}
         <div className="p-5 rounded-2xl bg-gradient-to-r from-brand-900/40 to-slate-900 border border-brand-500/20 text-center space-y-2">
-          <h3 className="text-sm font-extrabold text-white">Get the Fix Mate App</h3>
-          <p className="text-[11px] text-slate-400">Book services faster, track orders in real-time, and get exclusive app-only offers</p>
+          <h3 className="text-sm font-extrabold text-white">{t("home.getApp")}</h3>
+          <p className="text-[11px] text-slate-400">{t("home.getAppDesc")}</p>
           <div className="flex items-center justify-center gap-2">
             <button className="px-4 py-2 rounded-xl bg-white text-black text-[10px] font-bold">📱 App Store</button>
             <button className="px-4 py-2 rounded-xl bg-white text-black text-[10px] font-bold">▶️ Play Store</button>
