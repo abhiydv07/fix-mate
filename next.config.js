@@ -16,7 +16,7 @@ const nextConfig = {
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
               "style-src 'self' 'unsafe-inline' https://unpkg.com",
-              "img-src 'self' data: blob: https://unpkg.com https://*.tile.openstreetmap.org https://avatars.githubusercontent.com https://*.supabase.co https://lh3.googleusercontent.com",
+              "img-src 'self' data: blob: https://unpkg.com https://*.tile.openstreetmap.org https://avatars.githubusercontent.com https://*.supabase.co https://lh3.googleusercontent.com https://images.unsplash.com",
               "font-src 'self' https://fonts.gstatic.com",
               "connect-src 'self' https://*.supabase.co https://nominatim.openstreetmap.org https://generativelanguage.googleapis.com https://api.resend.com",
               "frame-src 'none'",
