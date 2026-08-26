@@ -12,12 +12,23 @@ import { createClient } from "@/lib/supabase/client";
 import dynamic from "next/dynamic";
 import { StarRating } from "@/components/StarRating";
 import { useI18n } from "@/lib/i18n";
+import { CitySelector } from "@/components/CitySelector";
 
 const AiTriageWidget = dynamic(
   () => import("@/components/AiTriageWidget").then((m) => m.AiTriageWidget),
   { ssr: false, loading: () => <div className="h-40 rounded-2xl bg-slate-200 dark:bg-slate-900 animate-pulse" /> }
 );
 import { BookingReminder } from "@/components/BookingReminder";
+import { AnimatedStats } from "@/components/AnimatedStats";
+import { TestimonialsCarousel } from "@/components/TestimonialsCarousel";
+import { BeforeAfterGallery } from "@/components/BeforeAfterGallery";
+import { NotificationTicker } from "@/components/NotificationTicker";
+import { GuaranteesBanner } from "@/components/GuaranteesBanner";
+import { ServicePackagesPreview } from "@/components/ServicePackagesPreview";
+import { FeaturedPro } from "@/components/FeaturedPro";
+import { BlogArticles } from "@/components/BlogArticles";
+import { AppDownloadCTA } from "@/components/AppDownloadCTA";
+import { RecentlyViewed } from "@/components/RecentlyViewed";
 
 interface Service {
   id: string;
@@ -94,6 +105,16 @@ export default function Home() {
     }
   }, []);
 
+  // Track recently viewed
+  const trackView = useCallback((s: Service, catName: string) => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("fixmate-recently-viewed") || "[]");
+      const entry = { id: s.id, name: s.name, category: catName, price: s.base_price };
+      const filtered = stored.filter((v: {id: string}) => v.id !== s.id);
+      localStorage.setItem("fixmate-recently-viewed", JSON.stringify([entry, ...filtered].slice(0, 10)));
+    } catch {}
+  }, []);
+
   return (
     <div className="flex-1 flex flex-col pb-20 md:pb-8">
       <main className="flex-1 px-4 md:px-8 pt-4 space-y-8">
@@ -109,9 +130,8 @@ export default function Home() {
           </div>
 
           <div className="relative z-10 max-w-2xl mx-auto text-center space-y-5">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-white/90 text-[10px] font-semibold">
-              <MapPin className="w-3 h-3" />
-              Indiranagar, Bengaluru — {t("hero.activeZone")}
+            <div className="inline-flex items-center gap-2">
+              <CitySelector />
             </div>
 
             <h1 className="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">
@@ -141,8 +161,8 @@ export default function Home() {
                       <Link
                         key={s.id}
                         href={`/services/${cat?.name?.toLowerCase().replace(/\s+/g, "-") || "general"}/${s.id}`}
-                        onClick={() => setSearchQuery("")}
-                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                    onClick={() => { setSearchQuery(""); }}
+                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
                       >
                         <div className="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center">
                           <Wrench className="w-4 h-4 text-brand-500" />
@@ -181,9 +201,24 @@ export default function Home() {
         </section>
 
         {/* ═══════════════════════════════
+            SOCIAL PROOF TICKER
+           ═══════════════════════════════ */}
+        <NotificationTicker />
+
+        {/* ═══════════════════════════════
             BOOKING REMINDERS
            ═══════════════════════════════ */}
         <BookingReminder />
+
+        {/* ═══════════════════════════════
+            GUARANTEES BANNER
+           ═══════════════════════════════ */}
+        <GuaranteesBanner />
+
+        {/* ═══════════════════════════════
+            ANIMATED STATS
+           ═══════════════════════════════ */}
+        <AnimatedStats />
 
         {/* ═══════════════════════════════
             CATEGORIES — 2-row scrollable grid
@@ -352,6 +387,16 @@ export default function Home() {
         )}
 
         {/* ═══════════════════════════════
+            FEATURED PRO OF THE DAY
+           ═══════════════════════════════ */}
+        <FeaturedPro />
+
+        {/* ═══════════════════════════════
+            SERVICE PACKAGES PREVIEW
+           ═══════════════════════════════ */}
+        <ServicePackagesPreview />
+
+        {/* ═══════════════════════════════
             WHY FIX MATE — trust indicators
            ═══════════════════════════════ */}
         <section className="space-y-3">
@@ -373,6 +418,21 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+        {/* ═══════════════════════════════
+            BEFORE & AFTER GALLERY
+           ═══════════════════════════════ */}
+        <BeforeAfterGallery />
+
+        {/* ═══════════════════════════════
+            TESTIMONIALS CAROUSEL
+           ═══════════════════════════════ */}
+        <TestimonialsCarousel />
+
+        {/* ═══════════════════════════════
+            BLOG ARTICLES
+           ═══════════════════════════════ */}
+        <BlogArticles />
 
         {/* ═══════════════════════════════
             HOW IT WORKS — numbered steps
@@ -466,6 +526,16 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+        {/* ═══════════════════════════════
+            RECENTLY VIEWED
+           ═══════════════════════════════ */}
+        <RecentlyViewed />
+
+        {/* ═══════════════════════════════
+            APP DOWNLOAD CTA
+           ═══════════════════════════════ */}
+        <AppDownloadCTA />
 
         {/* ═══════════════════════════════
             CONTACT — CTA card
