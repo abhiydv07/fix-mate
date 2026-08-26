@@ -142,6 +142,7 @@ export function BookingWizard({ service }: BookingWizardProps) {
 
     const scheduledTimestamp = `${selectedDate}T${convertSlotTo24H(selectedTimeSlot)}:00.000Z`;
 
+    const selectedAddr = addresses.find(a => a.id === selectedAddressId);
     const result = await createBooking({
       service_id: service.id,
       address_id: selectedAddressId,
@@ -149,6 +150,13 @@ export function BookingWizard({ service }: BookingWizardProps) {
       price: totalPrice,
       notes: notes,
       couponCode: appliedCoupon?.code,
+      serviceName: service.name,
+      servicePrice: service.base_price,
+      serviceDuration: service.est_duration_min || 45,
+      serviceCategoryId: service.category_id,
+      addressLine1: selectedAddr?.line1 || selectedAddr?.label || "Home",
+      addressCity: selectedAddr?.city || "Bengaluru",
+      addressPincode: selectedAddr?.pincode || "560038",
     } as any);
 
     setIsSubmitting(false);

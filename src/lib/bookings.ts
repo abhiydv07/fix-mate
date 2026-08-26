@@ -7,6 +7,13 @@ export interface BookingPayload {
   price: number;
   notes?: string;
   couponCode?: string;
+  serviceName?: string;
+  servicePrice?: number;
+  serviceDuration?: number;
+  serviceCategoryId?: string;
+  addressLine1?: string;
+  addressCity?: string;
+  addressPincode?: string;
 }
 
 export interface BookingItem {
@@ -34,6 +41,13 @@ export async function createBooking(payload: BookingPayload): Promise<{ success:
         scheduledAt: payload.scheduled_at,
         notes: payload.notes,
         couponCode: payload.couponCode,
+        serviceName: payload.serviceName,
+        servicePrice: payload.servicePrice,
+        serviceDuration: payload.serviceDuration,
+        serviceCategoryId: payload.serviceCategoryId,
+        addressLine1: payload.addressLine1,
+        addressCity: payload.addressCity,
+        addressPincode: payload.addressPincode,
       }),
     });
 

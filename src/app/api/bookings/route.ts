@@ -60,7 +60,26 @@ export async function POST(request: Request) {
       .eq("id", serviceId)
       .single();
 
-    const basePrice = serviceData ? Number(serviceData.base_price) : 299;
+    // If service doesn't exist in DB (fallback UUID), try to insert it first
+    if (!serviceData) {
+      // Attempt to insert the service so the foreign key is satisfied
+      const svcName = body.serviceName || "Home Service";
+      const svcPrice = body.servicePrice || 299;
+      const svcDuration = body.serviceDuration || 45;
+      const svcCategoryId = body.serviceCategoryId;
+      
+      // Try to insert the service (ignore if already exists)
+      await supabase.from("services").upsert({
+        id: serviceId,
+        name: svcName,
+        base_price: svcPrice,
+        est_duration_min: svcDuration,
+        category_id: svcCategoryId || "11111111-1111-1111-1111-111111111111",
+        description: svcName,
+      }, { onConflict: "id" });
+    }
+
+    const basePrice = serviceData ? Number(serviceData.base_price) : (body.servicePrice || 299);
     const convenienceFee = 49;
     let discountAmount = 0;
 
@@ -112,13 +131,32 @@ export async function POST(request: Request) {
       .contains("service_area_pincodes", [deliveryPincode])
       .order("avg_rating", { ascending: false });
 
+    // Ensure address exists — if not, create a default one
+    const { data: addrExists } = await supabase
+      .from("addresses")
+      .select("id")
+      .eq("id", addressId)
+      .single();
+
+    let actualAddressId = addressId;
+    if (!addrExists) {
+      const { data: newAddr } = await supabase.from("addresses").insert({
+        user_id: user.id,
+        line1: body.addressLine1 || "Home",
+        city: body.addressCity || "Bengaluru",
+        pincode: body.addressPincode || "560038",
+        label: "home",
+      }).select("id").single();
+      if (newAddr) actualAddressId = newAddr.id;
+    }
+
     // Insert new booking record with status 'pending'
     const { data: newBooking, error: insertError } = await supabase
       .from("bookings")
       .insert({
         customer_id: user.id,
         service_id: serviceId,
-        address_id: addressId,
+        address_id: actualAddressId,
         status: "pending",
         scheduled_at: scheduledAt,
         price: totalPrice,
