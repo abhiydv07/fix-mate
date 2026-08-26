@@ -62,13 +62,13 @@ export function AiTriageWidget() {
       : "Low Match";
 
   return (
-    <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-900/80 border border-brand-500/20 space-y-4 shadow-xl shadow-brand-500/5">
+    <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-900/80 border border-slate-200 dark:border-brand-500/20 space-y-4 shadow-lg dark:shadow-xl dark:shadow-brand-500/5">
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center border border-brand-500/30">
+        <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-500 flex items-center justify-center border border-brand-500/20">
           <Sparkles className="w-4 h-4" />
         </div>
         <div>
-          <h3 className="font-bold text-sm text-slate-100">Describe Your Problem</h3>
+          <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">Describe Your Problem</h3>
           <p className="text-[10px] text-slate-400">AI-powered service matching</p>
         </div>
       </div>
@@ -79,7 +79,7 @@ export function AiTriageWidget() {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="e.g. My kitchen tap is leaking badly..."
-          className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500"
+          className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-brand-500"
         />
         <Button
           type="submit"
@@ -102,18 +102,18 @@ export function AiTriageWidget() {
       )}
 
       {result && (
-        <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+        <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Wrench className="w-4 h-4 text-brand-400" />
-              <span className="font-bold text-sm text-slate-100">{result.category}</span>
+              <span className="font-bold text-sm text-slate-900 dark:text-slate-100">{result.category}</span>
             </div>
             <span className={`text-[10px] font-bold ${confidenceColor} bg-slate-900 px-2 py-0.5 rounded-full border border-slate-800`}>
               {confidenceLabel} · {Math.round(result.confidence * 100)}%
             </span>
           </div>
 
-          <p className="text-xs text-slate-300 leading-relaxed">{result.suggestion}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{result.suggestion}</p>
 
           <Link href={`/services/${encodeURIComponent(result.category.toLowerCase())}`}>
             <Button size="sm" className="w-full text-xs font-bold py-2.5 flex items-center justify-center gap-1.5">
