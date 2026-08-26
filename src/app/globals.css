@@ -104,3 +104,164 @@ body {
   background: #232d3f;
   border-radius: 2px;
 }
+
+/* ============================================
+   LIGHT MODE — Override hardcoded dark classes
+   ============================================ */
+:not(.dark) body {
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+/* Header */
+:not(.dark) header {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: #e2e8f0 !important;
+}
+:not(.dark) header h1 {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  -webkit-text-fill-color: #1e293b !important;
+  color: #1e293b !important;
+}
+:not(.dark) header p {
+  color: #64748b !important;
+}
+
+/* All hardcoded dark backgrounds → light */
+:not(.dark) .bg-slate-950,
+:not(.dark) .bg-slate-900,
+:not(.dark) .bg-slate-900\/60,
+:not(.dark) .bg-slate-900\/50,
+:not(.dark) .bg-slate-900\/80 {
+  background-color: #ffffff !important;
+}
+
+:not(.dark) .bg-slate-800,
+:not(.dark) .bg-slate-800\/50 {
+  background-color: #f1f5f9 !important;
+}
+
+:not(.dark) .bg-slate-950\/95,
+:not(.dark) .bg-slate-950\/90 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Card borders */
+:not(.dark) .border-slate-800,
+:not(.dark) .border-slate-800\/80,
+:not(.dark) .border-slate-800\/60,
+:not(.dark) .border-slate-900\/50 {
+  border-color: #e2e8f0 !important;
+}
+
+:not(.dark) .border-slate-700 {
+  border-color: #cbd5e1 !important;
+}
+
+/* Text colors */
+:not(.dark) .text-white {
+  color: #1e293b !important;
+}
+
+:not(.dark) .text-slate-100,
+:not(.dark) .text-slate-200 {
+  color: #1e293b !important;
+}
+
+:not(.dark) .text-slate-300 {
+  color: #475569 !important;
+}
+
+:not(.dark) .text-slate-400 {
+  color: #64748b !important;
+}
+
+:not(.dark) .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+/* Input fields */
+:not(.dark) input.bg-slate-900,
+:not(.dark) textarea.bg-slate-900,
+:not(.dark) .bg-slate-900.border-slate-800 input,
+:not(.dark) input[type="text"].bg-slate-900,
+:not(.dark) input[type="email"].bg-slate-900,
+:not(.dark) input[type="password"].bg-slate-900,
+:not(.dark) input[type="number"].bg-slate-900 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+:not(.dark) input::placeholder,
+:not(.dark) textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Dividers */
+:not(.dark) .divide-slate-800\/60 > * + * {
+  border-color: #f1f5f9 !important;
+}
+
+/* Mobile nav */
+:not(.dark) nav.fixed {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: #e2e8f0 !important;
+}
+:not(.dark) nav.fixed .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+/* Search bar gradient */
+:not(.dark) .bg-slate-900.border.border-slate-800.shadow-lg {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+}
+
+/* Emergency banner */
+:not(.dark) .from-rose-900\/20 {
+  background: linear-gradient(to right, rgba(254, 226, 226, 0.6), #ffffff) !important;
+}
+
+/* Offer cards */
+:not(.dark) .from-brand-900\/40 {
+  background: linear-gradient(to right, rgba(224, 239, 254, 0.8), #ffffff) !important;
+}
+:not(.dark) .from-emerald-900\/30 {
+  background: linear-gradient(to right, rgba(209, 250, 229, 0.6), #ffffff) !important;
+}
+:not(.dark) .from-amber-900\/30,
+:not(.dark) .from-amber-900\/20,
+:not(.dark) .from-amber-900\/40 {
+  background: linear-gradient(to right, rgba(254, 243, 199, 0.6), #ffffff) !important;
+}
+
+/* Theme toggle button */
+:not(.dark) button.bg-slate-900 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+:not(.dark) button.bg-slate-900:hover {
+  background-color: #e2e8f0 !important;
+}
+
+/* Provider sidebar */
+:not(.dark) .bg-slate-950.border-r {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Footer */
+:not(.dark) footer {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Scrollbar */
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+:not(.dark) .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}

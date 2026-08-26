@@ -82,7 +82,7 @@ export function Header() {
           <Wrench className="w-5 h-5" />
         </div>
         <div>
-          <h1 className="font-bold text-lg leading-none bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+          <h1 className="font-bold text-lg leading-none text-white dark:text-white text-slate-900">
             Fix Mate
           </h1>
           <p className="text-[10px] text-slate-400 font-medium">Home Services Marketplace</p>
