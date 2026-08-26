@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { I18nProvider } from "@/lib/i18n";
 import { ThemeProvider } from "next-themes";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { WhatsAppCTA } from "@/components/WhatsAppCTA";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -46,6 +47,7 @@ export default function RootLayout({
           <div id="main-content" className="flex-1" role="main">{children}</div>
           <Footer />
           <MobileNav />
+          <WhatsAppCTA />
         </div>
         </I18nProvider>
         </ThemeProvider>
