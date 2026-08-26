@@ -13,6 +13,7 @@ import dynamic from "next/dynamic";
 import { StarRating } from "@/components/StarRating";
 import { useI18n } from "@/lib/i18n";
 import { CitySelector } from "@/components/CitySelector";
+import { FALLBACK_CATEGORIES, FALLBACK_SERVICES } from "@/lib/services";
 
 const AiTriageWidget = dynamic(
   () => import("@/components/AiTriageWidget").then((m) => m.AiTriageWidget),
@@ -80,8 +81,8 @@ export default function Home() {
       supabase.from("services").select("*").order("name"),
       supabase.from("categories").select("*").order("name"),
     ]);
-    setServices(sRes.data || []);
-    setCategories(cRes.data || []);
+    setServices(sRes.data && sRes.data.length > 0 ? sRes.data : FALLBACK_SERVICES);
+    setCategories(cRes.data && cRes.data.length > 0 ? cRes.data : FALLBACK_CATEGORIES);
   }
 
   const trendingServices = services.slice(0, 6);

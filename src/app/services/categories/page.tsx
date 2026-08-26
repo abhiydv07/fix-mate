@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { FALLBACK_CATEGORIES, FALLBACK_SERVICES } from "@/lib/services";
 
 interface Category {
   id: string;
@@ -33,8 +34,8 @@ export default function CategoriesPage() {
       supabase.from("categories").select("*").order("name"),
       supabase.from("services").select("id, name, base_price, category_id"),
     ]);
-    setCategories(cRes.data || []);
-    setServices(sRes.data || []);
+    setCategories(cRes.data && cRes.data.length > 0 ? cRes.data : FALLBACK_CATEGORIES);
+    setServices(sRes.data && sRes.data.length > 0 ? sRes.data : FALLBACK_SERVICES);
     setIsLoading(false);
   }
 

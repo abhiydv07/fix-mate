@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Search, SlidersHorizontal, Star, X, Wrench, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { StarRating } from "@/components/StarRating";
+import { FALLBACK_CATEGORIES, FALLBACK_SERVICES } from "@/lib/services";
 
 interface Service {
   id: string;
@@ -39,8 +40,8 @@ export default function ServicesPage() {
       supabase.from("services").select("*").order("name"),
       supabase.from("categories").select("*").order("name"),
     ]);
-    setServices(servicesRes.data || []);
-    setCategories(categoriesRes.data || []);
+    setServices(servicesRes.data && servicesRes.data.length > 0 ? servicesRes.data : FALLBACK_SERVICES);
+    setCategories(categoriesRes.data && categoriesRes.data.length > 0 ? categoriesRes.data : FALLBACK_CATEGORIES);
     setIsLoading(false);
   }
 
