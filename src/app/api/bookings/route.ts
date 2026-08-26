@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { enforceRateLimit } from "@/lib/rate-limit";
 
 // Zod Validation Schema for Booking creation
@@ -31,6 +32,13 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json({ error: "Unauthorized. Please sign in to book." }, { status: 401 });
     }
+
+    // Service-role client for operations that need to bypass RLS
+    // (services table only has SELECT policy, but we need to upsert for bookings)
+    const adminSupabase = createServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+      process.env.SUPABASE_SERVICE_ROLE_KEY || ""
+    );
 
     const body = await request.json();
     const validation = bookingSchema.safeParse(body);
@@ -68,8 +76,8 @@ export async function POST(request: Request) {
       const svcDuration = body.serviceDuration || 45;
       const svcCategoryId = body.serviceCategoryId;
       
-      // Try to insert the service (ignore if already exists)
-      await supabase.from("services").upsert({
+      // Use admin client to bypass RLS (services table only has SELECT policy)
+      await adminSupabase.from("services").upsert({
         id: serviceId,
         name: svcName,
         base_price: svcPrice,
@@ -146,13 +154,14 @@ export async function POST(request: Request) {
 
     let actualAddressId = addressId;
     if (!addrExists) {
-      const { data: newAddr } = await supabase.from("addresses").insert({
+      const { data: newAddr } = await adminSupabase.from("addresses").upsert({
+        id: addressId,
         user_id: user.id,
         line1: body.addressLine1 || "Home",
         city: body.addressCity || "Bengaluru",
         pincode: body.addressPincode || "560038",
         label: "home",
-      }).select("id").single();
+      }, { onConflict: "id" }).select("id").single();
       if (newAddr) actualAddressId = newAddr.id;
     }
 
