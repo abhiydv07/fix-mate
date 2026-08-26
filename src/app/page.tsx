@@ -123,28 +123,39 @@ export default function Home() {
         {/* ═══════════════════════════════════════════
             HERO SECTION — Bold gradient with search
            ═══════════════════════════════════════════ */}
-        <section className="relative -mx-4 md:-mx-8 px-4 md:px-8 pt-8 pb-10 bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900 dark:from-brand-600 dark:via-brand-700 dark:to-brand-900 rounded-b-3xl overflow-hidden">
-          {/* Background decoration */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
-            <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-brand-400/10 rounded-full blur-2xl" />
-          </div>
-
-          <div className="relative z-10 max-w-2xl mx-auto text-center space-y-5">
-            <div className="inline-flex items-center gap-2">
-              <CitySelector />
+        <section className="relative -mx-4 md:-mx-8 overflow-hidden rounded-b-3xl">
+          {/* Desktop: Split layout. Mobile: Image behind text */}
+          <div className="relative min-h-[340px] md:min-h-[400px]">
+            {/* Hero Image — full background */}
+            <div className="absolute inset-0">
+              <img
+                src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&q=80&auto=format&fit=crop"
+                alt="Professional home service technician"
+                className="w-full h-full object-cover"
+                loading="eager"
+              />
+              {/* Gradient overlay for readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-brand-900/95 via-brand-800/85 to-brand-700/40 dark:from-brand-950/95 dark:via-brand-900/85 dark:to-brand-800/40" />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-900/60 via-transparent to-transparent" />
             </div>
 
-            <h1 className="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">
-              Home Services,
-              <br />
-              <span className="text-amber-300">Zero Upfront.</span>
-            </h1>
-            <p className="text-xs md:text-sm text-white/70 max-w-md mx-auto leading-relaxed">
-              Book verified professionals. Pay only after the work is done. Plumbing, electrical, cleaning, and 50+ services.
-            </p>
+            {/* Content */}
+            <div className="relative z-10 px-4 md:px-8 pt-8 pb-10">
+              <div className="max-w-xl md:ml-8 space-y-5">
+                <div className="inline-flex items-center gap-2">
+                  <CitySelector />
+                </div>
 
-            {/* Search Bar */}
+                <h1 className="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">
+                  Home Services,
+                  <br />
+                  <span className="text-amber-300">Zero Upfront.</span>
+                </h1>
+                <p className="text-xs md:text-sm text-white/80 max-w-md leading-relaxed">
+                  Book verified professionals. Pay only after the work is done. Plumbing, electrical, cleaning, and 50+ services.
+                </p>
+
+                {/* Search Bar */}
             <div className="relative max-w-lg mx-auto">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input
@@ -185,18 +196,20 @@ export default function Home() {
               )}
             </div>
 
-            {/* Trust badges */}
-            <div className="flex items-center justify-center gap-4 pt-2">
-              {[
-                { icon: ShieldCheck, label: t("hero.verifiedPros") },
-                { icon: Zap, label: t("hero.arrival") },
-                { icon: CreditCard, label: t("hero.payAfter") },
-              ].map((b) => (
-                <div key={b.label} className="flex items-center gap-1 text-white/60">
-                  <b.icon className="w-3.5 h-3.5" />
-                  <span className="text-[10px] font-medium">{b.label}</span>
+                {/* Trust badges */}
+                <div className="flex items-center gap-4 pt-1">
+                  {[
+                    { icon: ShieldCheck, label: t("hero.verifiedPros") },
+                    { icon: Zap, label: t("hero.arrival") },
+                    { icon: CreditCard, label: t("hero.payAfter") },
+                  ].map((b) => (
+                    <div key={b.label} className="flex items-center gap-1 text-white/70">
+                      <b.icon className="w-3.5 h-3.5" />
+                      <span className="text-[10px] font-medium">{b.label}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </section>
