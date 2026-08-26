@@ -37,12 +37,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={inter.variable}>
-      <body className="min-h-screen bg-slate-950 dark:bg-slate-950 bg-[#f8fafc] text-slate-900 dark:text-slate-100 antialiased selection:bg-brand-500 selection:text-white flex flex-col justify-between">
+      <body className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-brand-500 selection:text-white flex flex-col justify-between">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
         <ServiceWorkerRegistration />
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <I18nProvider>
-        <div className="mx-auto max-w-md md:max-w-7xl w-full min-h-screen flex flex-col shadow-2xl bg-[#f8fafc] dark:bg-slate-950 border-x border-slate-200 dark:border-slate-900/50">
+        <div className="mx-auto max-w-md md:max-w-7xl w-full min-h-screen flex flex-col bg-white dark:bg-slate-950 border-x border-slate-200 dark:border-slate-900/50 shadow-xl shadow-slate-200/50 dark:shadow-none">
           <Header />
           <div id="main-content" className="flex-1" role="main">{children}</div>
           <Footer />
