@@ -189,6 +189,8 @@ export default function OrderTrackingPage({
     { key: "completed", label: "Completed", desc: "Work verified & payment collected" },
   ];
 
+  const isCancelled = order?.status === "cancelled";
+
   const getStepIndex = (status: string) => {
     const idx = steps.findIndex((s) => s.key === status);
     return idx >= 0 ? idx : 0;
@@ -233,62 +235,83 @@ export default function OrderTrackingPage({
 
             {/* Status Card */}
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-brand-400">
-                    Order #{order.id.slice(0, 8)}
-                  </span>
-                  <h1 className="text-lg font-extrabold text-white mt-0.5">
-                    {steps[currentStepIndex].label}
-                  </h1>
-                  <p className="text-xs text-slate-400">{steps[currentStepIndex].desc}</p>
-                </div>
-
-                <div className="text-right">
-                  <span className="text-xl font-black text-emerald-400">₹{order.price}</span>
-                  <p className="text-[10px] text-slate-400">Pay on Work</p>
-                </div>
-              </div>
-
-              {/* Realtime Progress Steps */}
-              <div className="space-y-3 pt-2">
-                {steps.map((st, i) => {
-                  const isPassed = i <= currentStepIndex;
-                  const isCurrent = i === currentStepIndex;
-
-                  return (
-                    <div key={st.key} className="flex items-start gap-3">
-                      <div
-                        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 transition-all ${
-                          isPassed
-                            ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
-                            : "bg-slate-950 text-slate-600 border border-slate-800"
-                        }`}
-                      >
-                        {isPassed ? "✓" : i + 1}
-                      </div>
-                      <div className="space-y-0.5">
-                        <h4
-                          className={`text-xs font-bold ${
-                            isCurrent
-                              ? "text-emerald-400"
-                              : isPassed
-                              ? "text-slate-200"
-                              : "text-slate-500"
-                          }`}
-                        >
-                          {st.label}
-                        </h4>
-                        <p className="text-[11px] text-slate-400">{st.desc}</p>
-                      </div>
+              {isCancelled ? (
+                /* ═══ CANCELLED STATE ═══ */
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-brand-400">
+                        Order #{order.id.slice(0, 8)}
+                      </span>
+                      <h1 className="text-lg font-extrabold text-rose-400 mt-0.5">
+                        Booking Cancelled
+                      </h1>
+                      <p className="text-xs text-slate-400">This booking has been cancelled and is no longer active.</p>
                     </div>
-                  );
-                })}
-              </div>
+                    <div className="text-right">
+                      <span className="text-xl font-black text-slate-500 line-through">₹{order.price}</span>
+                      <p className="text-[10px] text-slate-500">Cancelled</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                    <div className="w-8 h-8 rounded-full bg-rose-500/20 flex items-center justify-center">
+                      <span className="text-sm">🚫</span>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-rose-400">Cancelled</p>
+                      <p className="text-[10px] text-slate-400">No charges applied. You can rebook anytime.</p>
+                    </div>
+                  </div>
+                  <Link
+                    href="/services"
+                    className="block w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs text-center transition-colors"
+                  >
+                    Rebook a Service →
+                  </Link>
+                </div>
+              ) : (
+                /* ═══ NORMAL PROGRESS STATE ═══ */
+                <>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-brand-400">
+                        Order #{order.id.slice(0, 8)}
+                      </span>
+                      <h1 className="text-lg font-extrabold text-white mt-0.5">
+                        {steps[currentStepIndex]?.label || "Unknown"}
+                      </h1>
+                      <p className="text-xs text-slate-400">{steps[currentStepIndex]?.desc || ""}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-xl font-black text-emerald-400">₹{order.price}</span>
+                      <p className="text-[10px] text-slate-400">Pay on Work</p>
+                    </div>
+                  </div>
+
+                  {/* Realtime Progress Steps */}
+                  <div className="space-y-3 pt-2">
+                    {steps.map((st, i) => {
+                      const isPassed = i <= currentStepIndex;
+                      const isCurrent = i === currentStepIndex;
+                      return (
+                        <div key={st.key} className="flex items-start gap-3">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 transition-all ${isPassed ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20" : "bg-slate-950 text-slate-600 border border-slate-800"}`}>
+                            {isPassed ? "✓" : i + 1}
+                          </div>
+                          <div className="space-y-0.5">
+                            <h4 className={`text-xs font-bold ${isCurrent ? "text-emerald-400" : isPassed ? "text-slate-200" : "text-slate-500"}`}>{st.label}</h4>
+                            <p className="text-[11px] text-slate-400">{st.desc}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Provider Info Card */}
-            {order.provider_id && (
+            {order.provider_id && !isCancelled && (
               <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center font-bold">
@@ -307,51 +330,54 @@ export default function OrderTrackingPage({
             )}
 
             {/* Per-Booking Realtime Live Chat Panel */}
-            <BookingChatPanel bookingId={order.id} currentUserId={order.customer_id} />
+            {!isCancelled && <BookingChatPanel bookingId={order.id} currentUserId={order.customer_id} />}
 
             {/* Cash Confirmation & Tax Invoice Link */}
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-slate-200">Payment & Tax Invoice</span>
-                <Link
-                  href={`/orders/${order.id}/invoice`}
-                  className="text-xs text-brand-400 hover:underline font-semibold"
-                >
-                  View Tax Invoice →
-                </Link>
+            {!isCancelled && (
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-200">Payment & Tax Invoice</span>
+                  <Link
+                    href={`/orders/${order.id}/invoice`}
+                    className="text-xs text-brand-400 hover:underline font-semibold"
+                  >
+                    View Tax Invoice →
+                  </Link>
+                </div>
+                {order.status === "completed" && (
+                  <button
+                    onClick={async () => {
+                      await fetch("/api/payments/confirm", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ bookingId: order.id, role: "customer" }),
+                      });
+                      alert("Thank you! Your payment confirmation has been recorded.");
+                    }}
+                    className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20"
+                  >
+                    <CheckCircle2 className="w-4 h-4" /> Confirm I Paid ₹{order.price} Cash
+                  </button>
+                )}
               </div>
-
-              {order.status === "completed" && (
-                <button
-                  onClick={async () => {
-                    await fetch("/api/payments/confirm", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ bookingId: order.id, role: "customer" }),
-                    });
-                    alert("Thank you! Your payment confirmation has been recorded.");
-                  }}
-                  className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20"
-                >
-                  <CheckCircle2 className="w-4 h-4" /> Confirm I Paid ₹{order.price} Cash
-                </button>
-              )}
-            </div>
+            )}
 
             {/* Booking Actions - Cancel / Reschedule / Rebook */}
-            <BookingActions
-              bookingId={order.id}
-              status={order.status}
-              scheduledAt={order.scheduled_at}
-            />
+            {!isCancelled && (
+              <BookingActions
+                bookingId={order.id}
+                status={order.status}
+                scheduledAt={order.scheduled_at}
+              />
+            )}
 
             {/* Dispute Flag Section */}
-            {(order.status === "in_progress" || order.status === "completed") && (
+            {!isCancelled && (order.status === "in_progress" || order.status === "completed") && (
               <DisputeFlagSection bookingId={order.id} />
             )}
 
             {/* Invoice Download */}
-            {order.status === "completed" && (
+            {!isCancelled && order.status === "completed" && (
               <InvoiceGenerator
                 invoice={{
                   bookingId: order.id,
@@ -367,7 +393,7 @@ export default function OrderTrackingPage({
             )}
 
             {/* Warranty Claim */}
-            {order.status === "completed" && (
+            {!isCancelled && order.status === "completed" && (
               <WarrantyClaimForm
                 bookingId={order.id}
                 serviceName="Service Booking"
@@ -377,7 +403,7 @@ export default function OrderTrackingPage({
             )}
 
             {/* Post-Completion Customer Review Prompt */}
-            {order.status === "completed" && (
+            {!isCancelled && order.status === "completed" && (
               <BookingReviewForm bookingId={order.id} />
             )}
           </div>
