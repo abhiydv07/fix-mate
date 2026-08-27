@@ -43,6 +43,7 @@ interface OrderDetail {
   price: number;
   created_at: string;
   updated_at?: string;
+  cancel_reason?: string | null;
   address_lat?: number | null;
   address_lng?: number | null;
 }
@@ -262,6 +263,12 @@ export default function OrderTrackingPage({
                       <p className="text-[10px] text-slate-400">No charges applied. You can rebook anytime.</p>
                     </div>
                   </div>
+                  {order.cancel_reason && (
+                    <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Cancellation Reason</p>
+                      <p className="text-xs text-slate-200">{order.cancel_reason}</p>
+                    </div>
+                  )}
                   <Link
                     href="/services"
                     className="block w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs text-center transition-colors"
