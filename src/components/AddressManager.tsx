@@ -51,8 +51,8 @@ export function AddressManager() {
   const [line2, setLine2] = useState<string>("");
   const [city, setCity] = useState<string>("Noida");
   const [pincode, setPincode] = useState<string>("");
-  const [lat, setLat] = useState<number>(12.9716);
-  const [lng, setLng] = useState<number>(77.5946);
+  const [lat, setLat] = useState<number>(28.5802);
+  const [lng, setLng] = useState<number>(77.3340);
   const [isDefault, setIsDefault] = useState<boolean>(false);
 
   // Nominatim Autocomplete Search State
@@ -60,6 +60,7 @@ export function AddressManager() {
   const [searchResults, setSearchResults] = useState<NominatimResult[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isGeolocating, setIsGeolocating] = useState<boolean>(false);
+  const [geoError, setGeoError] = useState<string>("");
 
   useEffect(() => {
     loadAddresses();
@@ -110,10 +111,11 @@ export function AddressManager() {
   // Handle "Use Current Location" Browser Geolocation
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.");
+      setGeoError("Geolocation is not supported by your browser.");
       return;
     }
     setIsGeolocating(true);
+    setGeoError("");
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const currentLat = position.coords.latitude;
@@ -122,21 +124,34 @@ export function AddressManager() {
         setLng(currentLng);
 
         // Reverse geocode via Nominatim
-        const reverseData = await reverseGeocodeNominatim(currentLat, currentLng);
-        if (reverseData) {
-          setLine1(reverseData.display_name.split(",")[0] || reverseData.display_name);
-          if (reverseData.address) {
-            setCity(reverseData.address.city || reverseData.address.town || "Noida");
-            if (reverseData.address.postcode) setPincode(reverseData.address.postcode);
+        try {
+          const reverseData = await reverseGeocodeNominatim(currentLat, currentLng);
+          if (reverseData) {
+            setLine1(reverseData.display_name.split(",")[0] || reverseData.display_name);
+            if (reverseData.address) {
+              setCity(reverseData.address.city || reverseData.address.town || "Noida");
+              if (reverseData.address.postcode) setPincode(reverseData.address.postcode);
+            }
           }
+        } catch {
+          // Reverse geocode failed, keep coordinates
         }
         setIsGeolocating(false);
       },
       (err) => {
         console.error("Geolocation error:", err);
-        alert("Unable to fetch current location.");
+        let msg = "Unable to fetch location. ";
+        if (err.code === 1) {
+          msg += "Location permission was denied. Please allow location access in your browser settings and try again.";
+        } else if (err.code === 2) {
+          msg += "Location unavailable. Please search for your address manually.";
+        } else {
+          msg += "Location request timed out. Please try again or search manually.";
+        }
+        setGeoError(msg);
         setIsGeolocating(false);
-      }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
   };
 
@@ -335,6 +350,13 @@ export function AddressManager() {
                   {isGeolocating ? "Locating..." : "GPS Location"}
                 </Button>
               </div>
+
+              {/* Geolocation Error Message */}
+              {geoError && (
+                <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[10px] text-amber-400">
+                  ⚠️ {geoError}
+                </div>
+              )}
 
               {/* Nominatim Autocomplete Results Dropdown */}
               {isSearching && (
