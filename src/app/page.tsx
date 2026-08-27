@@ -202,7 +202,7 @@ export default function Home() {
 
             {/* Right — Photo Collage (Desktop only) */}
             <div className="hidden lg:grid w-[480px] grid-cols-2 grid-rows-2 gap-3 h-[420px] shrink-0">
-              {/* Top left — large */}
+              {/* Top left — large: Electrician */}
               <div className="row-span-2 rounded-3xl overflow-hidden relative group">
                 <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=600&q=80&auto=format&fit=crop" alt="Electrician at work" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
@@ -210,17 +210,17 @@ export default function Home() {
                   <span className="text-xs font-bold text-white bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">Electrical Work</span>
                 </div>
               </div>
-              {/* Top right */}
+              {/* Top right: Deep Cleaning */}
               <div className="rounded-3xl overflow-hidden relative group">
-                <img src="https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=400&q=80&auto=format&fit=crop" alt="Home cleaning" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" />
+                <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&q=80&auto=format&fit=crop" alt="Professional cleaning" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute bottom-3 left-3">
                   <span className="text-[10px] font-bold text-white bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">Deep Cleaning</span>
                 </div>
               </div>
-              {/* Bottom right */}
+              {/* Bottom right: AC Repair */}
               <div className="rounded-3xl overflow-hidden relative group">
-                <img src="https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=400&q=80&auto=format&fit=crop&crop=right" alt="AC Repair" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" />
+                <img src="https://images.unsplash.com/photo-1631545806609-04cf44b5ce01?w=400&q=80&auto=format&fit=crop" alt="AC servicing" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute bottom-3 left-3">
                   <span className="text-[10px] font-bold text-white bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">AC Repair</span>
