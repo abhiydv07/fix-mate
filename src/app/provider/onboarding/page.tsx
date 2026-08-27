@@ -1,16 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, ArrowLeft, CheckCircle2, User, Wrench, FileText, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 
-const SERVICES = [
-  "Plumbing", "Electrical", "Cleaning", "Appliance Repair", "Painting", "Carpentry",
-  "AC Repair", "Pest Control", "Water Purifier", "Geyser Installation"
-];
+interface CategoryItem {
+  id: string;
+  name: string;
+  icon: string | null;
+}
+
+interface ServiceItem {
+  id: string;
+  category_id: string;
+  name: string;
+  description: string | null;
+  base_price: number;
+  est_duration_min: number | null;
+}
 
 export default function ProviderOnboardingPage() {
   const router = useRouter();
@@ -18,18 +28,77 @@ export default function ProviderOnboardingPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [city, setCity] = useState("");
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
   const [experience, setExperience] = useState("1-3");
   const [bio, setBio] = useState("");
   const [aadhaar, setAadhaar] = useState("");
   const [pan, setPan] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [services, setServices] = useState<ServiceItem[]>([]);
   const supabase = createClient();
 
-  function toggleService(s: string) {
-    setSelectedServices((prev) => prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]);
+  useEffect(() => {
+    loadCategoriesAndServices();
+  }, []);
+
+  async function loadCategoriesAndServices() {
+    const { data: cats } = await supabase.from("categories").select("id, name, icon").eq("active", true);
+    if (cats && cats.length > 0) {
+      setCategories(cats);
+    } else {
+      // Fallback
+      setCategories([
+        { id: "11111111-1111-1111-1111-111111111111", name: "Plumbing", icon: "🚰" },
+        { id: "22222222-2222-2222-2222-222222222222", name: "Electrical", icon: "⚡" },
+        { id: "33333333-3333-3333-3333-333333333333", name: "Cleaning", icon: "🧹" },
+        { id: "44444444-4444-4444-4444-444444444444", name: "Appliances", icon: "🔌" },
+        { id: "55555555-5555-5555-5555-555555555555", name: "Painting", icon: "🎨" },
+        { id: "66666666-6666-6666-6666-666666666666", name: "Carpentry", icon: "🪚" },
+      ]);
+    }
+
+    const { data: svcs } = await supabase.from("services").select("*");
+    if (svcs && svcs.length > 0) {
+      setServices(svcs);
+    } else {
+      setServices([
+        { id: "a1111111-1111-1111-1111-111111111111", category_id: "11111111-1111-1111-1111-111111111111", name: "Tap Leak Repair", description: null, base_price: 299, est_duration_min: 45 },
+        { id: "a2222222-2222-2222-2222-222222222222", category_id: "11111111-1111-1111-1111-111111111111", name: "Drainage Unblocking", description: null, base_price: 499, est_duration_min: 60 },
+        { id: "b1111111-1111-1111-1111-111111111111", category_id: "22222222-2222-2222-2222-222222222222", name: "Ceiling Fan Installation", description: null, base_price: 349, est_duration_min: 45 },
+        { id: "c1111111-1111-1111-1111-111111111111", category_id: "33333333-3333-3333-3333-333333333333", name: "Home Deep Cleaning", description: null, base_price: 1499, est_duration_min: 240 },
+        { id: "d1111111-1111-1111-1111-111111111111", category_id: "44444444-4444-4444-4444-444444444444", name: "AC Repair & Service", description: null, base_price: 899, est_duration_min: 60 },
+        { id: "e1111111-1111-1111-1111-111111111111", category_id: "55555555-5555-5555-5555-555555555555", name: "Interior Wall Painting", description: null, base_price: 2499, est_duration_min: 480 },
+        { id: "f1111111-1111-1111-1111-111111111111", category_id: "66666666-6666-6666-6666-666666666666", name: "Furniture Assembly", description: null, base_price: 499, est_duration_min: 90 },
+      ]);
+    }
   }
+
+  function toggleCategory(catId: string) {
+    setSelectedCategoryIds((prev) => {
+      const next = prev.includes(catId) ? prev.filter((x) => x !== catId) : [...prev, catId];
+      // When toggling a category, select/deselect all its services
+      const catServices = services.filter((s) => s.category_id === catId).map((s) => s.id);
+      if (prev.includes(catId)) {
+        // Removing category — remove its services
+        setSelectedServiceIds((svcs) => svcs.filter((s) => !catServices.includes(s)));
+      } else {
+        // Adding category — add all its services
+        setSelectedServiceIds((svcs) => [...new Set([...svcs, ...catServices])]);
+      }
+      return next;
+    });
+  }
+
+  function toggleService(serviceId: string) {
+    setSelectedServiceIds((prev) => prev.includes(serviceId) ? prev.filter((x) => x !== serviceId) : [...prev, serviceId]);
+  }
+
+  const filteredServices = selectedCategoryIds.length > 0
+    ? services.filter((s) => selectedCategoryIds.includes(s.category_id))
+    : services;
 
   async function handleSubmit() {
     setIsSubmitting(true);
@@ -44,16 +113,27 @@ export default function ProviderOnboardingPage() {
       role: "provider",
     }, { onConflict: "id" });
 
-    // Create provider profile
+    // Create/update provider profile
     await supabase.from("provider_profiles").upsert({
-      user_id: user.id,
+      id: user.id,
       bio,
       experience_years: experience,
       is_available: true,
       verified: false,
       avg_rating: 0,
       total_reviews: 0,
-    }, { onConflict: "user_id" });
+    }, { onConflict: "id" });
+
+    // Save selected services to provider_services junction table
+    if (selectedServiceIds.length > 0) {
+      const serviceRows = selectedServiceIds.map((serviceId) => ({
+        provider_id: user.id,
+        service_id: serviceId,
+      }));
+      // Delete existing and re-insert
+      await supabase.from("provider_services").delete().eq("provider_id", user.id);
+      await supabase.from("provider_services").insert(serviceRows);
+    }
 
     // Update user metadata
     await supabase.auth.updateUser({
@@ -76,6 +156,9 @@ export default function ProviderOnboardingPage() {
             <p className="text-xs text-slate-400">
               Our team will review your application and KYC documents within 48 hours.
               You&apos;ll be notified once verified.
+            </p>
+            <p className="text-[10px] text-brand-400">
+              {selectedServiceIds.length} services selected across {selectedCategoryIds.length} categories
             </p>
           </div>
           <Link href="/provider/dashboard" className="block py-3 rounded-xl bg-brand-500 text-white text-xs font-bold">
@@ -131,44 +214,94 @@ export default function ProviderOnboardingPage() {
           </div>
         )}
 
-        {/* Step 1: Skills & Services */}
+        {/* Step 1: Categories & Services */}
         {step === 1 && (
           <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
             <div className="flex items-center gap-2 mb-2">
               <Wrench className="w-4 h-4 text-brand-400" />
-              <h3 className="text-sm font-bold text-white">Skills & Services</h3>
+              <h3 className="text-sm font-bold text-white">Select Your Departments</h3>
             </div>
-            <div className="space-y-3">
-              <div>
-                <label className="text-[10px] font-bold text-slate-400 block mb-2">Select Services You Offer *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {SERVICES.map((s) => (
-                    <button key={s} onClick={() => toggleService(s)}
-                      className={`p-2.5 rounded-xl border text-[10px] font-bold text-left transition-all ${
-                        selectedServices.includes(s) ? "bg-brand-500/10 border-brand-500/30 text-brand-400" : "bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700"
+            <p className="text-[10px] text-slate-400">Choose the categories you can work in. Select specific services within each.</p>
+
+            {/* Categories */}
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Departments</label>
+              <div className="grid grid-cols-3 gap-2">
+                {categories.map((cat) => {
+                  const isSelected = selectedCategoryIds.includes(cat.id);
+                  const serviceCount = services.filter((s) => s.category_id === cat.id).length;
+                  const selectedCount = services.filter((s) => s.category_id === cat.id && selectedServiceIds.includes(s.id)).length;
+                  return (
+                    <button key={cat.id} onClick={() => toggleCategory(cat.id)}
+                      className={`p-3 rounded-xl border text-center transition-all ${
+                        isSelected
+                          ? "bg-brand-500/10 border-brand-500/30 text-brand-400"
+                          : "bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700"
                       }`}>
-                      {selectedServices.includes(s) ? "✓ " : ""}{s}
+                      <span className="text-lg block mb-1">{cat.icon}</span>
+                      <span className="text-[10px] font-bold block">{cat.name}</span>
+                      {isSelected && (
+                        <span className="text-[8px] text-brand-300">{selectedCount}/{serviceCount}</span>
+                      )}
                     </button>
-                  ))}
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Services within selected categories */}
+            {selectedCategoryIds.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Specific Services</label>
+                <div className="space-y-1.5 max-h-64 overflow-y-auto">
+                  {filteredServices.map((svc) => {
+                    const isSelected = selectedServiceIds.includes(svc.id);
+                    const cat = categories.find((c) => c.id === svc.category_id);
+                    return (
+                      <button key={svc.id} onClick={() => toggleService(svc.id)}
+                        className={`w-full p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
+                          isSelected
+                            ? "bg-brand-500/10 border-brand-500/30"
+                            : "bg-slate-950 border-slate-800 hover:border-slate-700"
+                        }`}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">{cat?.icon}</span>
+                          <div>
+                            <span className={`text-xs font-bold ${isSelected ? "text-brand-400" : "text-slate-300"}`}>{svc.name}</span>
+                            <span className="text-[9px] text-slate-500 block">₹{svc.base_price} • {svc.est_duration_min}min</span>
+                          </div>
+                        </div>
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${
+                          isSelected ? "bg-brand-500 border-brand-400 text-white" : "border-slate-700"
+                        }`}>
+                          {isSelected && <span className="text-[10px]">✓</span>}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
+                <p className="text-[9px] text-slate-500">
+                  {selectedServiceIds.length} service(s) selected
+                </p>
               </div>
-              <div>
-                <label className="text-[10px] font-bold text-slate-400 block mb-1">Experience</label>
-                <select value={experience} onChange={(e) => setExperience(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-brand-500">
-                  <option value="0-1">Less than 1 year</option>
-                  <option value="1-3">1-3 years</option>
-                  <option value="3-5">3-5 years</option>
-                  <option value="5-10">5-10 years</option>
-                  <option value="10+">10+ years</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-slate-400 block mb-1">Bio / Description</label>
-                <textarea rows={3} value={bio} onChange={(e) => setBio(e.target.value)}
-                  placeholder="Tell customers about your expertise..."
-                  className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500" />
-              </div>
+            )}
+
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 block mb-1">Experience</label>
+              <select value={experience} onChange={(e) => setExperience(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-brand-500">
+                <option value="0-1">Less than 1 year</option>
+                <option value="1-3">1-3 years</option>
+                <option value="3-5">3-5 years</option>
+                <option value="5-10">5-10 years</option>
+                <option value="10+">10+ years</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 block mb-1">Bio / Description</label>
+              <textarea rows={3} value={bio} onChange={(e) => setBio(e.target.value)}
+                placeholder="Tell customers about your expertise..."
+                className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500" />
             </div>
           </div>
         )}
@@ -216,14 +349,33 @@ export default function ProviderOnboardingPage() {
                 <span className="text-slate-400">City</span><span className="text-white font-bold">{city || "—"}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-800">
+                <span className="text-slate-400">Departments</span>
+                <span className="text-white font-bold text-right">{selectedCategoryIds.length} categories</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-slate-800">
                 <span className="text-slate-400">Services</span>
-                <span className="text-white font-bold text-right">{selectedServices.join(", ") || "—"}</span>
+                <span className="text-white font-bold text-right">{selectedServiceIds.length} services</span>
               </div>
               <div className="flex justify-between py-2 border-b border-slate-800">
                 <span className="text-slate-400">Experience</span><span className="text-white font-bold">{experience} years</span>
               </div>
               <div className="flex justify-between py-2">
                 <span className="text-slate-400">Aadhaar</span><span className="text-white font-bold">{aadhaar ? "Provided" : "—"}</span>
+              </div>
+
+              {/* Show selected categories */}
+              <div className="pt-2 border-t border-slate-800 space-y-1">
+                <span className="text-[10px] font-bold text-slate-400">Assigned Departments:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedCategoryIds.map((catId) => {
+                    const cat = categories.find((c) => c.id === catId);
+                    return cat ? (
+                      <span key={catId} className="text-[10px] font-bold px-2 py-1 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20">
+                        {cat.icon} {cat.name}
+                      </span>
+                    ) : null;
+                  })}
+                </div>
               </div>
             </div>
           </div>

@@ -22,6 +22,7 @@ export default function AdminLayout({
   const links = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/providers", label: "Provider KYC", icon: Users },
+    { href: "/admin/providers/assign", label: "Assign Services", icon: Wrench },
     { href: "/admin/categories", label: "Categories", icon: Layers },
     { href: "/admin/services", label: "Services", icon: Wrench },
     { href: "/admin/disputes", label: "Disputes", icon: AlertTriangle },

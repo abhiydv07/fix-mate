@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Wrench, Calendar, MapPin, Clock, Check, X, ShieldAlert, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/client";
 
 interface BroadcastRequest {
   id: string;
@@ -14,12 +15,15 @@ interface BroadcastRequest {
   scheduled_at: string;
   price: number;
   created_at: string;
+  services?: { name: string; description: string } | null;
 }
 
 export default function ProviderRequestsPage() {
   const [requests, setRequests] = useState<BroadcastRequest[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [actionMessage, setActionMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [myServiceIds, setMyServiceIds] = useState<Set<string>>(new Set());
+  const supabase = createClient();
 
   useEffect(() => {
     loadRequests();
@@ -28,10 +32,23 @@ export default function ProviderRequestsPage() {
   async function loadRequests() {
     setIsLoading(true);
     try {
+      // First, get the current provider's service assignments
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: myServices } = await supabase
+          .from("provider_services")
+          .select("service_id")
+          .eq("provider_id", user.id);
+        
+        const serviceIds = new Set(myServices?.map((s) => s.service_id) || []);
+        setMyServiceIds(serviceIds);
+      }
+
+      // Then fetch all pending bookings
       const res = await fetch("/api/bookings");
       if (res.ok) {
         const data = await res.json();
-        // Filter pending broadcasts
+        // Filter pending broadcasts — show all if provider has no service assignments
         const pending = (data.bookings || []).filter(
           (b: BroadcastRequest) => b.status === "pending"
         );
@@ -79,6 +96,15 @@ export default function ProviderRequestsPage() {
     setRequests((prev) => prev.filter((r) => r.id !== bookingId));
   };
 
+  // Check if a request matches this provider's services
+  const isMatchingService = (req: BroadcastRequest) => {
+    if (myServiceIds.size === 0) return true; // Show all if no services assigned
+    return myServiceIds.has(req.service_id);
+  };
+
+  const matchingRequests = requests.filter(isMatchingService);
+  const otherRequests = requests.filter((r) => !isMatchingService(r));
+
   return (
     <div className="min-h-screen flex flex-col justify-between p-4 md:p-8 bg-slate-950 text-slate-100 pb-20 md:pb-8">
       {/* Header */}
@@ -88,7 +114,7 @@ export default function ProviderRequestsPage() {
         </Link>
         <span className="font-bold text-sm text-white">Provider Request Queue</span>
         <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
-          Live Broadcasts
+          {matchingRequests.length} Matched
         </span>
       </header>
 
@@ -100,7 +126,9 @@ export default function ProviderRequestsPage() {
           </span>
           <h1 className="text-xl font-extrabold text-white">Pending Job Requests</h1>
           <p className="text-xs text-slate-400">
-            First verified provider to click <strong className="text-slate-200">Accept</strong> gets assigned the job.
+            {myServiceIds.size > 0
+              ? `Showing bookings matching your ${myServiceIds.size} assigned services.`
+              : "No services assigned yet — showing all broadcasts."}
           </p>
         </div>
 
@@ -117,20 +145,23 @@ export default function ProviderRequestsPage() {
           </div>
         )}
 
-        {/* Requests List */}
+        {/* Matching Requests */}
         {isLoading ? (
           <div className="p-8 text-center text-xs text-slate-500 animate-pulse">
             Checking for pending job broadcasts...
           </div>
-        ) : requests.length === 0 ? (
+        ) : matchingRequests.length === 0 ? (
           <div className="p-8 rounded-2xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
             <Zap className="w-8 h-8 text-amber-400 mx-auto" />
-            <p className="text-xs font-semibold text-slate-300">No active job broadcasts in your area</p>
-            <p className="text-[11px] text-slate-500">New customer service bookings will appear here instantly.</p>
+            <p className="text-xs font-semibold text-slate-300">No matching job broadcasts</p>
+            <p className="text-[11px] text-slate-500">New bookings for your services will appear here instantly.</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {requests.map((req) => (
+            <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-1">
+              Matching Your Services ({matchingRequests.length})
+            </h3>
+            {matchingRequests.map((req) => (
               <div
                 key={req.id}
                 className="p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-brand-500/40 transition-all space-y-3 shadow-md"
@@ -140,7 +171,9 @@ export default function ProviderRequestsPage() {
                     <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">
                       Broadcast Request
                     </span>
-                    <h3 className="font-bold text-sm text-slate-100 mt-1">On-Demand Service Booking</h3>
+                    <h3 className="font-bold text-sm text-slate-100 mt-1">
+                      {req.services?.name || "Service Booking"}
+                    </h3>
                   </div>
                   <div className="text-right">
                     <span className="text-lg font-black text-emerald-400">₹{req.price}</span>
@@ -176,6 +209,34 @@ export default function ProviderRequestsPage() {
                     <Check className="w-3.5 h-3.5 mr-1" /> Accept Job
                   </Button>
                 </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Other Requests (not matching) */}
+        {otherRequests.length > 0 && (
+          <div className="space-y-3">
+            <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-1">
+              Other Services ({otherRequests.length})
+            </h3>
+            {otherRequests.map((req) => (
+              <div
+                key={req.id}
+                className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/60 space-y-2 opacity-60"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400">Broadcast Request</span>
+                    <h3 className="font-bold text-xs text-slate-300 mt-0.5">
+                      {req.services?.name || "Service Booking"}
+                    </h3>
+                  </div>
+                  <span className="text-sm font-bold text-slate-400">₹{req.price}</span>
+                </div>
+                <p className="text-[9px] text-slate-500">
+                  This service is not in your assigned departments.
+                </p>
               </div>
             ))}
           </div>

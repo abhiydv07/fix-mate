@@ -166,18 +166,39 @@ export async function POST(request: Request) {
       );
     }
 
-    // Provider Matching Engine: Find available verified providers
+    // Provider Matching Engine: Find verified providers offering THIS service
     let matchedProviders: unknown[] = [];
     try {
-      const { data } = await adminSupabase
-        .from("provider_profiles")
-        .select("id, avg_rating")
-        .eq("verified", true)
-        .eq("is_available", true)
-        .order("avg_rating", { ascending: false });
-      matchedProviders = data || [];
+      // Find providers linked to this service via provider_services junction table
+      const { data: serviceProviders } = await adminSupabase
+        .from("provider_services")
+        .select("provider_id")
+        .eq("service_id", serviceId);
+
+      if (serviceProviders && serviceProviders.length > 0) {
+        const providerIds = serviceProviders.map((sp) => sp.provider_id);
+        // Get verified, available providers from those matched
+        const { data } = await adminSupabase
+          .from("provider_profiles")
+          .select("id, avg_rating")
+          .in("id", providerIds)
+          .eq("verified", true)
+          .eq("is_available", true)
+          .order("avg_rating", { ascending: false });
+        matchedProviders = data || [];
+      }
+
+      // Fallback: if no provider is linked to this service, find any verified provider
+      if (matchedProviders.length === 0) {
+        const { data } = await adminSupabase
+          .from("provider_profiles")
+          .select("id, avg_rating")
+          .eq("verified", true)
+          .eq("is_available", true)
+          .order("avg_rating", { ascending: false });
+        matchedProviders = data || [];
+      }
     } catch {
-      // provider_profiles table may not exist yet
       matchedProviders = [];
     }
 

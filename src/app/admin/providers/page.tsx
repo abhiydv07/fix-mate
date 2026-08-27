@@ -104,6 +104,9 @@ export default function AdminProvidersPage() {
         <p className="text-xs text-slate-400">
           Only approved providers (<code className="text-emerald-400">verified = true</code>) are eligible to receive customer job broadcasts.
         </p>
+        <Link href="/admin/providers/assign" className="inline-flex items-center gap-1 text-[10px] font-bold text-brand-400 hover:underline mt-2">
+          → Assign Services to Providers
+        </Link>
       </div>
 
       {/* Message */}
