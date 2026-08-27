@@ -32,9 +32,9 @@ export function BookingActions({ bookingId, status, serviceName, scheduledAt }: 
   const [rescheduleDate, setRescheduleDate] = useState("");
   const [rescheduleTime, setRescheduleTime] = useState("");
 
-  const isActive = ["pending", "accepted", "on_the_way", "in_progress"].includes(status);
-  const canCancel = ["pending", "accepted"].includes(status);
-  const canReschedule = ["pending", "accepted"].includes(status);
+  const isActive = ["pending", "assigned", "on_the_way", "in_progress"].includes(status);
+  const canCancel = ["pending", "assigned"].includes(status);
+  const canReschedule = ["pending", "assigned"].includes(status);
   const isCompleted = status === "completed";
 
   // Generate next 7 days for reschedule
