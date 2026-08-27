@@ -199,157 +199,209 @@ export default function OrderTrackingPage({
 
   const currentStepIndex = order ? getStepIndex(order.status) : 0;
 
-  return (
-    <div className="min-h-screen flex flex-col justify-between p-4 md:p-8 bg-slate-950 text-slate-100 pb-20 md:pb-8">
-      {/* Header */}
-      <header className="flex items-center justify-between py-2 border-b border-slate-800/80 mb-6">
-        <Link href="/bookings" className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-slate-200">
-          <ArrowLeft className="w-4 h-4" /> My Bookings
-        </Link>
-        <span className="font-bold text-sm text-white">Live Tracking</span>
-        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Realtime
-        </span>
-      </header>
+  const statusConfig: Record<string, { color: string; bg: string; icon: string; label: string }> = {
+    pending: { color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20", icon: "⏳", label: "Pending" },
+    assigned: { color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20", icon: "👨‍🔧", label: "Assigned" },
+    on_the_way: { color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20", icon: "🚗", label: "On The Way" },
+    in_progress: { color: "text-brand-400", bg: "bg-brand-500/10 border-brand-500/20", icon: "🛠️", label: "In Progress" },
+    completed: { color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20", icon: "✅", label: "Completed" },
+    cancelled: { color: "text-rose-400", bg: "bg-rose-500/10 border-rose-500/20", icon: "🚫", label: "Cancelled" },
+  };
 
-      <main className="max-w-xl mx-auto w-full flex-1 space-y-6">
+  const currentStatus = order ? statusConfig[order.status] || statusConfig.pending : null;
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 md:pb-8">
+      {/* Header */}
+      <div className="sticky top-0 z-30 bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800/80">
+        <div className="max-w-2xl mx-auto px-4 md:px-8 h-14 flex items-center justify-between">
+          <Link href="/bookings" className="flex items-center gap-2 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-brand-500 transition-colors">
+            <ArrowLeft className="w-4 h-4" /> My Bookings
+          </Link>
+          <span className="font-bold text-sm text-slate-900 dark:text-white">Live Tracking</span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-[10px] font-bold">LIVE</span>
+          </div>
+        </div>
+      </div>
+
+      <main className="max-w-2xl mx-auto px-4 md:px-8 pt-6 space-y-5">
         {isLoading ? (
-          <div className="p-8 text-center text-xs text-slate-500 animate-pulse">
-            Connecting to Realtime tracking...
+          <div className="space-y-4">
+            <div className="h-56 rounded-3xl bg-slate-200 dark:bg-slate-900 animate-pulse" />
+            <div className="h-32 rounded-2xl bg-slate-200 dark:bg-slate-900 animate-pulse" />
+            <div className="h-24 rounded-2xl bg-slate-200 dark:bg-slate-900 animate-pulse" />
           </div>
         ) : !order ? (
-          <div className="p-8 rounded-2xl bg-slate-900/60 border border-slate-800 text-center space-y-2">
-            <p className="text-xs font-semibold text-slate-300">Order not found</p>
-            <Link href="/" className="text-xs text-brand-400 hover:underline">
-              Return to Services
+          <div className="py-20 text-center space-y-4">
+            <div className="w-20 h-20 rounded-3xl bg-slate-200 dark:bg-slate-900 flex items-center justify-center mx-auto text-4xl">📭</div>
+            <div>
+              <p className="text-lg font-bold text-slate-900 dark:text-white">Order not found</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">This booking doesn&apos;t exist or was removed.</p>
+            </div>
+            <Link href="/services" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm transition-colors shadow-lg shadow-brand-500/20">
+              Browse Services →
             </Link>
           </div>
         ) : (
-          <div className="space-y-6">
-            {/* Live Leaflet Realtime Tracking Map */}
-            <TrackingMap
-              destLat={order.address_lat || 28.5802}
-              destLng={order.address_lng || 77.3340}
-              providerLat={providerLat}
-              providerLng={providerLng}
-            />
-
-            {/* Status Card */}
-            <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 shadow-xl">
-              {isCancelled ? (
-                /* ═══ CANCELLED STATE ═══ */
-                <div className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-brand-400">
-                        Order #{order.id.slice(0, 8)}
-                      </span>
-                      <h1 className="text-lg font-extrabold text-rose-400 mt-0.5">
-                        Booking Cancelled
-                      </h1>
-                      <p className="text-xs text-slate-400">This booking has been cancelled and is no longer active.</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xl font-black text-slate-500 line-through">₹{order.price}</span>
-                      <p className="text-[10px] text-slate-500">Cancelled</p>
-                    </div>
+          <div className="space-y-5">
+            {/* ═══ STATUS HERO ═══ */}
+            <div className={`relative overflow-hidden rounded-3xl p-6 border ${currentStatus?.bg} transition-all`}>              
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{currentStatus?.icon}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Order #{order.id.slice(0, 8)}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-                    <div className="w-8 h-8 rounded-full bg-rose-500/20 flex items-center justify-center">
-                      <span className="text-sm">🚫</span>
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-rose-400">Cancelled</p>
-                      <p className="text-[10px] text-slate-400">No charges applied. You can rebook anytime.</p>
-                    </div>
-                  </div>
-                  {order.cancel_reason && (
-                    <div className="p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Cancellation Reason</p>
-                      <p className="text-xs text-slate-200">{order.cancel_reason}</p>
-                    </div>
-                  )}
-                  <Link
-                    href="/services"
-                    className="block w-full py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs text-center transition-colors"
-                  >
-                    Rebook a Service →
-                  </Link>
+                  <h1 className={`text-2xl font-black ${isCancelled ? "text-rose-500 dark:text-rose-400" : "text-slate-900 dark:text-white"}`}>
+                    {isCancelled ? "Booking Cancelled" : steps[currentStepIndex]?.label}
+                  </h1>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    {isCancelled ? "This booking is no longer active." : steps[currentStepIndex]?.desc}
+                  </p>
                 </div>
-              ) : (
-                /* ═══ NORMAL PROGRESS STATE ═══ */
-                <>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-brand-400">
-                        Order #{order.id.slice(0, 8)}
-                      </span>
-                      <h1 className="text-lg font-extrabold text-white mt-0.5">
-                        {steps[currentStepIndex]?.label || "Unknown"}
-                      </h1>
-                      <p className="text-xs text-slate-400">{steps[currentStepIndex]?.desc || ""}</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-xl font-black text-emerald-400">₹{order.price}</span>
-                      <p className="text-[10px] text-slate-400">Pay on Work</p>
-                    </div>
-                  </div>
+                <div className="text-right">
+                  <p className={`text-2xl font-black ${isCancelled ? "text-slate-400 line-through" : "text-emerald-600 dark:text-emerald-400"}`}>
+                    ₹{order.price}
+                  </p>
+                  <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 mt-0.5">
+                    {isCancelled ? "Cancelled" : "Pay on Work"}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-                  {/* Realtime Progress Steps */}
-                  <div className="space-y-3 pt-2">
+            {/* ═══ MAP ═══ */}
+            {!isCancelled && (
+              <div className="rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-lg">
+                <TrackingMap
+                  destLat={order.address_lat || 28.5802}
+                  destLng={order.address_lng || 77.3340}
+                  providerLat={providerLat}
+                  providerLng={providerLng}
+                />
+              </div>
+            )}
+
+            {/* ═══ PROGRESS STEPS ═══ */}
+            {!isCancelled && (
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">Order Progress</h3>
+                <div className="relative">
+                  {/* Vertical line */}
+                  <div className="absolute left-[11px] top-3 bottom-3 w-0.5 bg-slate-200 dark:bg-slate-800" />
+                  <div className="absolute left-[11px] top-3 w-0.5 bg-emerald-500 transition-all duration-500" style={{ height: `${(currentStepIndex / (steps.length - 1)) * 100}%` }} />
+                  
+                  <div className="space-y-4">
                     {steps.map((st, i) => {
                       const isPassed = i <= currentStepIndex;
                       const isCurrent = i === currentStepIndex;
                       return (
-                        <div key={st.key} className="flex items-start gap-3">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 transition-all ${isPassed ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20" : "bg-slate-950 text-slate-600 border border-slate-800"}`}>
+                        <div key={st.key} className="flex items-start gap-3 relative">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 z-10 transition-all duration-300 ${
+                            isCurrent
+                              ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 scale-110"
+                              : isPassed
+                              ? "bg-emerald-500 text-white"
+                              : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-2 border-slate-300 dark:border-slate-700"
+                          }`}>
                             {isPassed ? "✓" : i + 1}
                           </div>
-                          <div className="space-y-0.5">
-                            <h4 className={`text-xs font-bold ${isCurrent ? "text-emerald-400" : isPassed ? "text-slate-200" : "text-slate-500"}`}>{st.label}</h4>
-                            <p className="text-[11px] text-slate-400">{st.desc}</p>
+                          <div className="flex-1 pb-1">
+                            <h4 className={`text-sm font-bold ${
+                              isCurrent ? "text-emerald-600 dark:text-emerald-400" 
+                              : isPassed ? "text-slate-700 dark:text-slate-200" 
+                              : "text-slate-400 dark:text-slate-500"
+                            }`}>{st.label}</h4>
+                            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{st.desc}</p>
                           </div>
+                          {isCurrent && !isCancelled && (
+                            <span className="shrink-0 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[9px] font-bold border border-emerald-500/20">
+                              CURRENT
+                            </span>
+                          )}
                         </div>
                       );
                     })}
                   </div>
-                </>
-              )}
-            </div>
-
-            {/* Provider Info Card */}
-            {order.provider_id && !isCancelled && (
-              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-400 flex items-center justify-center font-bold">
-                    P
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-100">Assigned Professional</h4>
-                    <p className="text-[11px] text-emerald-400">Verified Service Partner</p>
-                  </div>
                 </div>
-
-                <button className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition-colors">
-                  <PhoneCall className="w-3.5 h-3.5 text-brand-400" /> Call Pro
-                </button>
               </div>
             )}
 
-            {/* Per-Booking Realtime Live Chat Panel */}
-            {!isCancelled && <BookingChatPanel bookingId={order.id} currentUserId={order.customer_id} />}
+            {/* ═══ CANCELLED REASON ═══ */}
+            {isCancelled && order.cancel_reason && (
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">📝</span>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">Cancellation Reason</h3>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl">{order.cancel_reason}</p>
+              </div>
+            )}
 
-            {/* Cash Confirmation & Tax Invoice Link */}
+            {/* ═══ PROVIDER CARD ═══ */}
+            {order.provider_id && !isCancelled && (
+              <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 text-white flex items-center justify-center font-bold text-lg shadow-lg shadow-brand-500/20">
+                    P
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">Assigned Professional</h4>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Verified & Background Checked</p>
+                    </div>
+                  </div>
+                </div>
+                <a href="tel:+919999999999" className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold transition-colors shadow-md shadow-brand-500/20">
+                  <PhoneCall className="w-3.5 h-3.5" /> Call
+                </a>
+              </div>
+            )}
+
+            {/* ═══ SCHEDULE INFO ═══ */}
             {!isCancelled && (
-              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-slate-200">Payment & Tax Invoice</span>
-                  <Link
-                    href={`/orders/${order.id}/invoice`}
-                    className="text-xs text-brand-400 hover:underline font-semibold"
-                  >
-                    View Tax Invoice →
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg">📅</span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Date</span>
+                  </div>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">
+                    {new Date(order.scheduled_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                  </p>
+                </div>
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg">⏰</span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Time</span>
+                  </div>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">
+                    {new Date(order.scheduled_at).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* ═══ PAYMENT ═══ */}
+            {!isCancelled && (
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">💳</span>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">Payment</h3>
+                  </div>
+                  <Link href={`/orders/${order.id}/invoice`} className="text-xs text-brand-500 dark:text-brand-400 font-semibold hover:underline">
+                    View Invoice →
                   </Link>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+                  <span className="text-sm text-slate-600 dark:text-slate-300">Total Amount</span>
+                  <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">₹{order.price}</span>
                 </div>
                 {order.status === "completed" && (
                   <button
@@ -359,17 +411,20 @@ export default function OrderTrackingPage({
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ bookingId: order.id, role: "customer" }),
                       });
-                      alert("Thank you! Your payment confirmation has been recorded.");
+                      alert("Payment confirmed!");
                     }}
-                    className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20"
+                    className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-500/20"
                   >
-                    <CheckCircle2 className="w-4 h-4" /> Confirm I Paid ₹{order.price} Cash
+                    <CheckCircle2 className="w-4 h-4" /> Confirm Payment ₹{order.price}
                   </button>
                 )}
               </div>
             )}
 
-            {/* Booking Actions - Cancel / Reschedule / Rebook */}
+            {/* ═══ CHAT ═══ */}
+            {!isCancelled && <BookingChatPanel bookingId={order.id} currentUserId={order.customer_id} />}
+
+            {/* ═══ ACTIONS ═══ */}
             {!isCancelled && (
               <BookingActions
                 bookingId={order.id}
@@ -378,12 +433,12 @@ export default function OrderTrackingPage({
               />
             )}
 
-            {/* Dispute Flag Section */}
+            {/* ═══ DISPUTE ═══ */}
             {!isCancelled && (order.status === "in_progress" || order.status === "completed") && (
               <DisputeFlagSection bookingId={order.id} />
             )}
 
-            {/* Invoice Download */}
+            {/* ═══ INVOICE ═══ */}
             {!isCancelled && order.status === "completed" && (
               <InvoiceGenerator
                 invoice={{
@@ -399,7 +454,7 @@ export default function OrderTrackingPage({
               />
             )}
 
-            {/* Warranty Claim */}
+            {/* ═══ WARRANTY ═══ */}
             {!isCancelled && order.status === "completed" && (
               <WarrantyClaimForm
                 bookingId={order.id}
@@ -409,9 +464,20 @@ export default function OrderTrackingPage({
               />
             )}
 
-            {/* Post-Completion Customer Review Prompt */}
+            {/* ═══ REVIEW ═══ */}
             {!isCancelled && order.status === "completed" && (
               <BookingReviewForm bookingId={order.id} />
+            )}
+
+            {/* ═══ REBOOK CTA ═══ */}
+            {isCancelled && (
+              <Link href="/services" className="block p-5 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-600 text-white text-center shadow-lg shadow-brand-500/20 hover:shadow-xl transition-all">
+                <p className="text-lg font-black mb-1">Need this service again?</p>
+                <p className="text-sm text-white/80">Rebook in seconds — zero upfront payment</p>
+                <div className="mt-3 inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-white text-brand-600 font-bold text-sm">
+                  Rebook a Service →
+                </div>
+              </Link>
             )}
           </div>
         )}
