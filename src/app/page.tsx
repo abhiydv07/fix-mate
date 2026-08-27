@@ -121,93 +121,103 @@ export default function Home() {
       <main className="flex-1 px-4 md:px-8 pt-4 space-y-8">
 
         {/* ═══════════════════════════════════════════
-            HERO SECTION — Bold gradient with search
+            HERO SECTION — Urban Company style
+            Left: heading + category grid
+            Right: photo collage
            ═══════════════════════════════════════════ */}
-        <section className="relative -mx-4 md:-mx-8 overflow-hidden rounded-b-3xl">
-          {/* Desktop: Split layout. Mobile: Image behind text */}
-          <div className="relative min-h-[340px] md:min-h-[400px]">
-            {/* Hero Image — full background */}
-            <div className="absolute inset-0">
-              <img
-                src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&q=80&auto=format&fit=crop"
-                alt="Professional home service technician"
-                className="w-full h-full object-cover"
-                loading="eager"
-              />
-              {/* Gradient overlay for readability */}
-              <div className="absolute inset-0 bg-gradient-to-r from-brand-900/95 via-brand-800/85 to-brand-700/40 dark:from-brand-950/95 dark:via-brand-900/85 dark:to-brand-800/40" />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-900/60 via-transparent to-transparent" />
-            </div>
-
-            {/* Content */}
-            <div className="relative z-10 px-4 md:px-8 pt-8 pb-10">
-              <div className="max-w-xl md:ml-8 space-y-5">
-                <div className="inline-flex items-center gap-2">
-                  <CitySelector />
-                </div>
-
-                <h1 className="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">
-                  Home Services,
+        <section className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-start gap-8 py-6">
+            {/* Left — Text + Categories */}
+            <div className="flex-1 space-y-8">
+              <div>
+                <h1 className="text-3xl md:text-[42px] font-black text-slate-900 dark:text-white leading-[1.15] tracking-tight">
+                  Home services at your
                   <br />
-                  <span className="text-amber-300">Zero Upfront.</span>
+                  <span className="bg-gradient-to-r from-brand-500 to-brand-600 bg-clip-text text-transparent">doorstep</span>
                 </h1>
-                <p className="text-xs md:text-sm text-white/80 max-w-md leading-relaxed">
-                  Book verified professionals. Pay only after the work is done. Plumbing, electrical, cleaning, and 50+ services.
-                </p>
+              </div>
 
-                {/* Search Bar */}
-            <div className="relative max-w-lg mx-auto">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t("home.searchPlaceholder")}
-                className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-xl shadow-black/10"
-              />
-              {searchQuery && filteredServices.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xl z-50 max-h-72 overflow-y-auto">
-                  {filteredServices.slice(0, 6).map((s) => {
-                    const cat = categories.find((c) => c.id === s.category_id);
-                    return (
-                      <Link
-                        key={s.id}
-                        href={`/services/${cat?.name?.toLowerCase().replace(/\s+/g, "-") || "general"}/${s.id}`}
-                    onClick={() => { setSearchQuery(""); }}
-                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
-                      >
-                        <div className="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center">
-                          <Wrench className="w-4 h-4 text-brand-500" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">{s.name}</span>
-                          <span className="text-[10px] text-slate-500">{cat?.name} • ₹{s.base_price}</span>
-                        </div>
-                        <ArrowUpRight className="w-4 h-4 text-slate-400 shrink-0" />
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-              {searchQuery && filteredServices.length === 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 p-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xl z-50 text-center">
-                  <p className="text-xs text-slate-400">{t("catalog.noResults")}</p>
-                </div>
-              )}
+              {/* Category Grid — UC style with emoji icons */}
+              <div className="grid grid-cols-4 gap-3">
+                {[
+                  { name: "Plumbing", icon: "🔧", color: "bg-blue-50", darkColor: "dark:bg-blue-500/10", href: "/services/plumbing" },
+                  { name: "Electrical", icon: "⚡", color: "bg-amber-50", darkColor: "dark:bg-amber-500/10", href: "/services/electrical" },
+                  { name: "Cleaning", icon: "🧹", color: "bg-emerald-50", darkColor: "dark:bg-emerald-500/10", href: "/services/cleaning" },
+                  { name: "Appliances", icon: "🔌", color: "bg-rose-50", darkColor: "dark:bg-rose-500/10", href: "/services/appliances" },
+                  { name: "Painting", icon: "🎨", color: "bg-purple-50", darkColor: "dark:bg-purple-500/10", href: "/services/painting" },
+                  { name: "Carpentry", icon: "🪚", color: "bg-orange-50", darkColor: "dark:bg-orange-500/10", href: "/services/carpentry" },
+                  { name: "Pest Control", icon: "🐛", color: "bg-lime-50", darkColor: "dark:bg-lime-500/10", href: "/services/cleaning" },
+                  { name: "All Services", icon: "✨", color: "bg-brand-50", darkColor: "dark:bg-brand-500/10", href: "/services" },
+                ].map((cat) => (
+                  <Link
+                    key={cat.name}
+                    href={cat.href}
+                    className="flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:shadow-lg hover:border-brand-200 dark:hover:border-brand-500/30 transition-all group"
+                  >
+                    <div className={`w-14 h-14 rounded-2xl ${cat.color} ${cat.darkColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>                      
+                      <span className="text-2xl">{cat.icon}</span>
+                    </div>
+                    <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-brand-500 dark:group-hover:text-brand-400 transition-colors text-center leading-tight">{cat.name}</span>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Quick search on mobile */}
+              <div className="relative md:hidden">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t("home.searchPlaceholder")}
+                  className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-lg"
+                />
+                {searchQuery && filteredServices.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl z-50 max-h-72 overflow-y-auto">
+                    {filteredServices.slice(0, 6).map((s) => {
+                      const cat = categories.find((c) => c.id === s.category_id);
+                      return (
+                        <Link key={s.id} href={`/services/${cat?.name?.toLowerCase().replace(/\s+/g, "-") || "general"}/${s.id}`} onClick={() => setSearchQuery("")} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                          <div className="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center">
+                            <Wrench className="w-4 h-4 text-brand-500" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">{s.name}</span>
+                            <span className="text-[10px] text-slate-500">{cat?.name} • ₹{s.base_price}</span>
+                          </div>
+                          <ArrowUpRight className="w-4 h-4 text-slate-400 shrink-0" />
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
 
-                {/* Trust badges */}
-                <div className="flex items-center gap-4 pt-1">
-                  {[
-                    { icon: ShieldCheck, label: t("hero.verifiedPros") },
-                    { icon: Zap, label: t("hero.arrival") },
-                    { icon: CreditCard, label: t("hero.payAfter") },
-                  ].map((b) => (
-                    <div key={b.label} className="flex items-center gap-1 text-white/70">
-                      <b.icon className="w-3.5 h-3.5" />
-                      <span className="text-[10px] font-medium">{b.label}</span>
-                    </div>
-                  ))}
+            {/* Right — Photo Collage (Desktop only) */}
+            <div className="hidden lg:grid w-[480px] grid-cols-2 grid-rows-2 gap-3 h-[420px] shrink-0">
+              {/* Top left — large */}
+              <div className="row-span-2 rounded-3xl overflow-hidden relative group">
+                <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=600&q=80&auto=format&fit=crop" alt="Electrician at work" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                <div className="absolute bottom-4 left-4">
+                  <span className="text-xs font-bold text-white bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">Electrical Work</span>
+                </div>
+              </div>
+              {/* Top right */}
+              <div className="rounded-3xl overflow-hidden relative group">
+                <img src="https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=400&q=80&auto=format&fit=crop" alt="Home cleaning" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                <div className="absolute bottom-3 left-3">
+                  <span className="text-[10px] font-bold text-white bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">Deep Cleaning</span>
+                </div>
+              </div>
+              {/* Bottom right */}
+              <div className="rounded-3xl overflow-hidden relative group">
+                <img src="https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=400&q=80&auto=format&fit=crop&crop=right" alt="AC Repair" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                <div className="absolute bottom-3 left-3">
+                  <span className="text-[10px] font-bold text-white bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">AC Repair</span>
                 </div>
               </div>
             </div>
