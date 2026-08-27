@@ -49,7 +49,7 @@ export function AddressManager() {
   const [label, setLabel] = useState<string>("Home");
   const [line1, setLine1] = useState<string>("");
   const [line2, setLine2] = useState<string>("");
-  const [city, setCity] = useState<string>("Bengaluru");
+  const [city, setCity] = useState<string>("Noida");
   const [pincode, setPincode] = useState<string>("");
   const [lat, setLat] = useState<number>(12.9716);
   const [lng, setLng] = useState<number>(77.5946);
@@ -97,7 +97,7 @@ export function AddressManager() {
 
     if (result.address) {
       if (result.address.city || result.address.town) {
-        setCity(result.address.city || result.address.town || "Bengaluru");
+        setCity(result.address.city || result.address.town || "Noida");
       }
       if (result.address.postcode) {
         setPincode(result.address.postcode);
@@ -126,7 +126,7 @@ export function AddressManager() {
         if (reverseData) {
           setLine1(reverseData.display_name.split(",")[0] || reverseData.display_name);
           if (reverseData.address) {
-            setCity(reverseData.address.city || reverseData.address.town || "Bengaluru");
+            setCity(reverseData.address.city || reverseData.address.town || "Noida");
             if (reverseData.address.postcode) setPincode(reverseData.address.postcode);
           }
         }
@@ -189,7 +189,7 @@ export function AddressManager() {
     setLabel("Home");
     setLine1("");
     setLine2("");
-    setCity("Bengaluru");
+    setCity("Noida");
     setPincode("");
     setLat(12.9716);
     setLng(77.5946);
@@ -417,7 +417,7 @@ export function AddressManager() {
                     required
                     value={pincode}
                     onChange={(e) => setPincode(e.target.value)}
-                    placeholder="560038"
+                    placeholder="201301"
                     className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-100"
                   />
                 </div>

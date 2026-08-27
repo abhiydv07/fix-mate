@@ -4,7 +4,7 @@ import { useState } from "react";
 import { MapPin, ChevronDown, Check, Clock } from "lucide-react";
 
 const cities = [
-  { name: "Bengaluru", status: "active" as const },
+  { name: "Noida & Greater Noida", status: "active" as const },
   { name: "Mumbai", status: "coming" as const },
   { name: "Delhi NCR", status: "coming" as const },
   { name: "Hyderabad", status: "coming" as const },
@@ -14,7 +14,7 @@ const cities = [
 
 export function CitySelector() {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState("Bengaluru");
+  const [selected, setSelected] = useState("Noida & Greater Noida");
 
   return (
     <div className="relative">

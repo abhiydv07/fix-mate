@@ -207,7 +207,7 @@ export default function ProviderOnboardingPage() {
               </div>
               <div>
                 <label className="text-[10px] font-bold text-slate-400 block mb-1">City *</label>
-                <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Bengaluru"
+                <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Noida"
                   className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500" />
               </div>
             </div>

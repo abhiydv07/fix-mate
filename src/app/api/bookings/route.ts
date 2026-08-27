@@ -215,9 +215,11 @@ export async function POST(request: Request) {
         id: addressId,
         user_id: user.id,
         line1: body.addressLine1 || "Home",
-        city: body.addressCity || "Bengaluru",
-        pincode: body.addressPincode || "560038",
+        city: body.addressCity || "Noida",
+        pincode: body.addressPincode || "201301",
         label: "home",
+        lat: body.addressLat || 28.5802,
+        lng: body.addressLng || 77.3340,
       }, { onConflict: "id" }).select("id").single();
       if (newAddr) {
         actualAddressId = newAddr.id;

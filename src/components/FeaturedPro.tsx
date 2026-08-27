@@ -31,7 +31,7 @@ export function FeaturedPro() {
                 <span className="text-[10px] font-bold text-slate-500 ml-1">4.9 (312 reviews)</span>
               </div>
               <div className="flex items-center gap-3 text-[10px] text-slate-500 dark:text-slate-400">
-                <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" /> Indiranagar</span>
+                <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" /> Sector 62, Noida</span>
                 <span className="flex items-center gap-0.5"><Clock className="w-2.5 h-2.5" /> 8 yrs exp</span>
               </div>
               <div className="flex items-center gap-2 flex-wrap">

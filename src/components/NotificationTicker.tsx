@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { MapPin, Clock } from "lucide-react";
 
 const notifications = [
-  { name: "Rahul", area: "Indiranagar", service: "Plumbing", time: "2 min ago" },
-  { name: "Priya", area: "Koramangala", service: "AC Repair", time: "5 min ago" },
-  { name: "Vikram", area: "HSR Layout", service: "Deep Cleaning", time: "8 min ago" },
+  { name: "Rahul", area: "Sector 62", service: "Plumbing", time: "2 min ago" },
+  { name: "Priya", area: "Greater Noida", service: "AC Repair", time: "5 min ago" },
+  { name: "Vikram", area: "Sector 18", service: "Deep Cleaning", time: "8 min ago" },
   { name: "Ananya", area: "Whitefield", service: "Electrical", time: "12 min ago" },
   { name: "Deepak", area: "JP Nagar", service: "Painting", time: "15 min ago" },
   { name: "Neha", area: "Electronic City", service: "Carpentry", time: "18 min ago" },

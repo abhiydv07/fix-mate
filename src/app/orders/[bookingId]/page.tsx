@@ -43,6 +43,8 @@ interface OrderDetail {
   price: number;
   created_at: string;
   updated_at?: string;
+  address_lat?: number | null;
+  address_lng?: number | null;
 }
 
 export default function OrderTrackingPage({
@@ -82,6 +84,12 @@ export default function OrderTrackingPage({
       supabase.removeChannel(bookingChannel);
     };
   }, [params.bookingId]);
+
+  // Fetch address coordinates for the map destination
+  useEffect(() => {
+    if (!order?.address_id) return;
+    fetchAddressCoords(order.address_id);
+  }, [order?.address_id]);
 
   // 2. Subscribe to Supabase Realtime updates on provider_locations table when provider is assigned
   useEffect(() => {
@@ -126,6 +134,10 @@ export default function OrderTrackingPage({
 
       if (!error && data) {
         setOrder(data as OrderDetail);
+        // If booking has address_id, fetch coordinates
+        if (data.address_id) {
+          fetchAddressCoords(data.address_id);
+        }
       }
     } catch (err) {
       console.error("Fetch order error:", err);
@@ -134,8 +146,26 @@ export default function OrderTrackingPage({
     }
   }
 
+  async function fetchAddressCoords(addressId: string) {
+    try {
+      const { data } = await supabase
+        .from("addresses")
+        .select("lat, lng")
+        .eq("id", addressId)
+        .single();
+
+      if (data?.lat && data?.lng) {
+        // Use address coordinates for the map
+        setOrder((prev) => prev ? { ...prev, address_lat: data.lat, address_lng: data.lng } : prev);
+      }
+    } catch {
+      // Fallback: use Noida coordinates
+    }
+  }
+
   async function fetchInitialProviderLocation(providerId: string) {
     try {
+      // Use user-scoped client — RLS allows reading provider_locations
       const { data } = await supabase
         .from("provider_locations")
         .select("lat, lng")
@@ -147,7 +177,7 @@ export default function OrderTrackingPage({
         setProviderLng(data.lng);
       }
     } catch {
-      // Ignore fallback
+      // Fallback: no location yet
     }
   }
 
@@ -195,8 +225,8 @@ export default function OrderTrackingPage({
           <div className="space-y-6">
             {/* Live Leaflet Realtime Tracking Map */}
             <TrackingMap
-              destLat={12.9716}
-              destLng={77.5946}
+              destLat={order.address_lat || 28.5802}
+              destLng={order.address_lng || 77.3340}
               providerLat={providerLat}
               providerLng={providerLng}
             />

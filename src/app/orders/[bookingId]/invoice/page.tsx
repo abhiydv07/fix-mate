@@ -73,8 +73,8 @@ export default async function InvoicePage({
           <div>
             <span className="text-[10px] uppercase font-bold text-slate-400">Billed To</span>
             <p className="font-bold text-slate-100 print:text-slate-900">Valued Customer</p>
-            <p>Delivery Address: Indiranagar, Bengaluru</p>
-            <p>Pincode: 560038</p>
+            <p>Delivery Address: Noida & Greater Noida</p>
+            <p>Pincode: 201301</p>
           </div>
           <div className="text-right">
             <span className="text-[10px] uppercase font-bold text-slate-400">Invoice Date</span>

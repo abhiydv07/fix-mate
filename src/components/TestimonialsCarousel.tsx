@@ -14,12 +14,12 @@ interface Testimonial {
 }
 
 const testimonials: Testimonial[] = [
-  { id: 1, name: "Priya Sharma", location: "Indiranagar, Bengaluru", rating: 5, text: "Booked a plumber at 10 PM for an emergency leak. He arrived in 20 minutes and fixed it perfectly. Paid after the work — zero hassle!", service: "Plumbing", avatar: "PS" },
-  { id: 2, name: "Rahul Mehta", location: "Koramangala, Bengaluru", rating: 5, text: "The electrician was extremely professional. Fixed my wiring issue in 30 minutes. The fact that I pay only after work gives me so much confidence.", service: "Electrical", avatar: "RM" },
-  { id: 3, name: "Ananya Reddy", location: "HSR Layout, Bengaluru", rating: 4, text: "Used Fix Mate for a deep clean. The team was punctual and thorough. My apartment looks brand new. Great value for money.", service: "Cleaning", avatar: "AR" },
-  { id: 4, name: "Vikram Singh", location: "Whitefield, Bengaluru", rating: 5, text: "My AC stopped working in peak summer. Fix Mate connected me with a verified technician within 15 minutes. Fixed and cooling in under an hour!", service: "AC Repair", avatar: "VS" },
-  { id: 5, name: "Deepa Nair", location: "JP Nagar, Bengaluru", rating: 5, text: "The painting service was outstanding. Clean work, no mess, and the color consultation was a nice touch. Will use again for sure.", service: "Painting", avatar: "DN" },
-  { id: 6, name: "Arjun Patel", location: "Electronic City, Bengaluru", rating: 5, text: "Best home service app I've used. The transparency in pricing and pay-after-work model is a game changer. No more bad service experiences.", service: "Appliance Repair", avatar: "AP" },
+  { id: 1, name: "Priya Sharma", location: "Sector 62, Noida", rating: 5, text: "Booked a plumber at 10 PM for an emergency leak. He arrived in 20 minutes and fixed it perfectly. Paid after the work — zero hassle!", service: "Plumbing", avatar: "PS" },
+  { id: 2, name: "Rahul Mehta", location: "Greater Noida", rating: 5, text: "The electrician was extremely professional. Fixed my wiring issue in 30 minutes. The fact that I pay only after work gives me so much confidence.", service: "Electrical", avatar: "RM" },
+  { id: 3, name: "Ananya Reddy", location: "Sector 18, Noida", rating: 4, text: "Used Fix Mate for a deep clean. The team was punctual and thorough. My apartment looks brand new. Great value for money.", service: "Cleaning", avatar: "AR" },
+  { id: 4, name: "Vikram Singh", location: "Alpha II, Greater Noida", rating: 5, text: "My AC stopped working in peak summer. Fix Mate connected me with a verified technician within 15 minutes. Fixed and cooling in under an hour!", service: "AC Repair", avatar: "VS" },
+  { id: 5, name: "Deepa Nair", location: "Sector 75, Noida", rating: 5, text: "The painting service was outstanding. Clean work, no mess, and the color consultation was a nice touch. Will use again for sure.", service: "Painting", avatar: "DN" },
+  { id: 6, name: "Arjun Patel", location: "Knowledge Park, Greater Noida", rating: 5, text: "Best home service app I've used. The transparency in pricing and pay-after-work model is a game changer. No more bad service experiences.", service: "Appliance Repair", avatar: "AP" },
 ];
 
 export function TestimonialsCarousel() {

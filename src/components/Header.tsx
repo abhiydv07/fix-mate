@@ -92,7 +92,7 @@ export function Header() {
       {/* Center Location Selector (Desktop/Tablet) */}
       <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300">
         <MapPin className="w-3.5 h-3.5 text-brand-400 shrink-0" />
-        <span>Location: <strong className="text-slate-100">Indiranagar, Bengaluru</strong></span>
+        <span>Location: <strong className="text-slate-100">Noida & Greater Noida</strong></span>
       </div>
 
       {/* Right Navigation & Auth Actions */}

@@ -155,8 +155,8 @@ export function BookingWizard({ service }: BookingWizardProps) {
       serviceDuration: service.est_duration_min || 45,
       serviceCategoryId: service.category_id,
       addressLine1: selectedAddr?.line1 || selectedAddr?.label || "Home",
-      addressCity: selectedAddr?.city || "Bengaluru",
-      addressPincode: selectedAddr?.pincode || "560038",
+      addressCity: selectedAddr?.city || "Noida",
+      addressPincode: selectedAddr?.pincode || "201301",
     } as any);
 
     setIsSubmitting(false);

@@ -42,8 +42,7 @@ export default function TrackingMap({
       iconAnchor: [17, 17],
     });
 
-    if (!mapInstanceRef.current) {
-      const map = L.map(mapContainerRef.current).setView([destLat, destLng], 14);
+    if (!mapInstanceRef.current) {        const map = L.map(mapContainerRef.current).setView([destLat || 28.5802, destLng || 77.3340], 14);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
