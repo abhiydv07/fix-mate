@@ -200,31 +200,58 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right — Photo Collage (Desktop only) */}
-            <div className="hidden lg:grid w-[480px] grid-cols-2 grid-rows-2 gap-3 h-[420px] shrink-0">
-              {/* Top left — large: Electrician */}
-              <div className="row-span-2 rounded-3xl overflow-hidden relative group">
-                <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=600&q=80&auto=format&fit=crop" alt="Electrician at work" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                <div className="absolute bottom-4 left-4">
-                  <span className="text-xs font-bold text-white bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">Electrical Work</span>
+            {/* Right — Stats + Features (Desktop only) */}
+            <div className="hidden lg:flex w-[420px] shrink-0 flex-col gap-4">
+              {/* Stats row */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { num: "12,500+", label: "Bookings Done", color: "from-blue-500 to-blue-600" },
+                  { num: "180+", label: "Verified Pros", color: "from-emerald-500 to-emerald-600" },
+                  { num: "4.8★", label: "Avg Rating", color: "from-amber-500 to-amber-600" },
+                ].map((s) => (
+                  <div key={s.label} className={`p-4 rounded-2xl bg-gradient-to-br ${s.color} text-white shadow-lg`}>                      
+                    <p className="text-xl font-black leading-none">{s.num}</p>
+                    <p className="text-[10px] font-semibold text-white/80 mt-1">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* How it works mini */}
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 space-y-4">
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">How it works</h3>
+                <div className="space-y-3">
+                  {[
+                    { step: "1", title: "Choose a service", desc: "Browse categories or search", icon: "🔍", color: "bg-blue-50 dark:bg-blue-500/10" },
+                    { step: "2", title: "Pick date & time", desc: "Select your preferred slot", icon: "📅", color: "bg-amber-50 dark:bg-amber-500/10" },
+                    { step: "3", title: "Pro arrives", desc: "Verified expert at your door", icon: "🔧", color: "bg-emerald-50 dark:bg-emerald-500/10" },
+                    { step: "4", title: "Pay after work", desc: "Zero upfront payment", icon: "💰", color: "bg-purple-50 dark:bg-purple-500/10" },
+                  ].map((item) => (
+                    <div key={item.step} className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl ${item.color} flex items-center justify-center shrink-0`}>                          
+                        <span className="text-lg">{item.icon}</span>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{item.title}</p>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-500">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-              {/* Top right: Deep Cleaning */}
-              <div className="rounded-3xl overflow-hidden relative group">
-                <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&q=80&auto=format&fit=crop" alt="Professional cleaning" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                <div className="absolute bottom-3 left-3">
-                  <span className="text-[10px] font-bold text-white bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">Deep Cleaning</span>
-                </div>
-              </div>
-              {/* Bottom right: AC Repair */}
-              <div className="rounded-3xl overflow-hidden relative group">
-                <img src="https://images.unsplash.com/photo-1631545806609-04cf44b5ce01?w=400&q=80&auto=format&fit=crop" alt="AC servicing" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="eager" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                <div className="absolute bottom-3 left-3">
-                  <span className="text-[10px] font-bold text-white bg-white/20 backdrop-blur-sm px-2.5 py-1 rounded-full">AC Repair</span>
-                </div>
+
+              {/* Trust badges */}
+              <div className="flex gap-3">
+                {[
+                  { icon: "🛡️", label: "100% Money Back" },
+                  { icon: "🔄", label: "Free Re-service" },
+                  { icon: "✅", label: "Verified Pros" },
+                  { icon: "💳", label: "No Hidden Fees" },
+                ].map((b) => (
+                  <div key={b.label} className="flex-1 p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 text-center">
+                    <span className="text-lg block mb-1">{b.icon}</span>
+                    <span className="text-[9px] font-bold text-slate-600 dark:text-slate-400 leading-tight block">{b.label}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
