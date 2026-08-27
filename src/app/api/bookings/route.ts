@@ -280,11 +280,12 @@ export async function GET(request: Request) {
 
     const userRole = profile?.role || "customer";
 
-    let query = adminSupabase.from("bookings").select("*");
+    // Join with services table to get service name, and profiles for provider name
+    let query = adminSupabase
+      .from("bookings")
+      .select("*, services(name, description, base_price), provider:profiles!bookings_provider_id_fkey(name, avatar_url)");
 
     if (userRole === "provider" || userRole === "admin") {
-      // Providers see: their assigned jobs + all pending broadcasts
-      // Admin sees: everything
       if (userRole === "admin") {
         // Admin sees all bookings
       } else {
