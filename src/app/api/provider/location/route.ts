@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 
 const locationSchema = z.object({
   lat: z.number(),
@@ -27,8 +28,14 @@ export async function POST(request: Request) {
 
     const { lat, lng } = validation.data;
 
-    // Upsert provider live GPS coordinates into provider_locations
-    const { data, error } = await supabase
+    // Admin client — bypasses RLS for location upsert
+    const adminSupabase = createServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+      process.env.SUPABASE_SERVICE_ROLE_KEY || ""
+    );
+
+    // Upsert provider live GPS coordinates
+    const { data, error } = await adminSupabase
       .from("provider_locations")
       .upsert(
         {

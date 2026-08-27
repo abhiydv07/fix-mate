@@ -265,15 +265,33 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userRole = user.user_metadata?.role || "customer";
+    // Admin client to bypass RLS for reads
+    const adminSupabase = createServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+      process.env.SUPABASE_SERVICE_ROLE_KEY || ""
+    );
 
-    let query = supabase.from("bookings").select("*");
+    // Fetch role from profiles table (not user_metadata)
+    const { data: profile } = await adminSupabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
 
-    if (userRole === "provider") {
-      query = query.or(`provider_id.eq.${user.id},status.eq.pending`);
-    } else if (userRole === "admin") {
-      // Admin sees all
+    const userRole = profile?.role || "customer";
+
+    let query = adminSupabase.from("bookings").select("*");
+
+    if (userRole === "provider" || userRole === "admin") {
+      // Providers see: their assigned jobs + all pending broadcasts
+      // Admin sees: everything
+      if (userRole === "admin") {
+        // Admin sees all bookings
+      } else {
+        query = query.or(`provider_id.eq.${user.id},status.eq.pending`);
+      }
     } else {
+      // Customers see only their own bookings
       query = query.eq("customer_id", user.id);
     }
 
