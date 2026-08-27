@@ -78,7 +78,7 @@ export default function MyBookingsPage() {
   }
 
   const filtered = bookings.filter((b) => {
-    if (filter === "active") return ["pending", "accepted", "on_the_way", "in_progress"].includes(b.status);
+    if (filter === "active") return ["pending", "assigned", "on_the_way", "in_progress"].includes(b.status);
     if (filter === "completed") return b.status === "completed";
     if (filter === "cancelled") return b.status === "cancelled";
     return true;
@@ -86,7 +86,7 @@ export default function MyBookingsPage() {
 
   const filterCounts = {
     all: bookings.length,
-    active: bookings.filter((b) => ["pending", "accepted", "on_the_way", "in_progress"].includes(b.status)).length,
+    active: bookings.filter((b) => ["pending", "assigned", "on_the_way", "in_progress"].includes(b.status)).length,
     completed: bookings.filter((b) => b.status === "completed").length,
     cancelled: bookings.filter((b) => b.status === "cancelled").length,
   };

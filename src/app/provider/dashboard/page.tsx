@@ -59,7 +59,7 @@ export default function ProviderDashboardPage() {
       .from("bookings")
       .select("id, status, price, scheduled_at, customer_id, address_id, service_id")
       .eq("provider_id", user.id)
-      .in("status", ["accepted", "on_the_way", "in_progress"])
+      .in("status", ["assigned", "on_the_way", "in_progress"])
       .order("scheduled_at", { ascending: true });
 
     if (jobs) {
@@ -119,7 +119,7 @@ export default function ProviderDashboardPage() {
   }
 
   const statusColors: Record<string, string> = {
-    accepted: "text-blue-400 bg-blue-500/10",
+    assigned: "text-blue-400 bg-blue-500/10",
     on_the_way: "text-amber-400 bg-amber-500/10",
     in_progress: "text-brand-400 bg-brand-500/10",
   };
@@ -250,7 +250,7 @@ export default function ProviderDashboardPage() {
                     <button className="flex-1 py-2 rounded-lg bg-brand-500 text-center text-[10px] font-bold text-white flex items-center justify-center gap-1 hover:bg-brand-600">
                       <Navigation className="w-3 h-3" /> Directions
                     </button>
-                    {job.status === "accepted" && (
+                    {job.status === "assigned" && (
                       <Link href={`/orders/${job.id}`} className="flex-1 py-2 rounded-lg bg-emerald-500 text-center text-[10px] font-bold text-white flex items-center justify-center gap-1 hover:bg-emerald-600">
                         Start Job
                       </Link>

@@ -37,6 +37,15 @@ export default function LoginPage() {
 
   const supabase = createClient();
 
+  // Read redirectTo from URL query params (e.g. /login?redirectTo=/book/abc)
+  const getRedirectTo = () => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("redirectTo") || "/";
+    }
+    return "/";
+  };
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -45,9 +54,10 @@ export default function LoginPage() {
     setIsLoading(true);
     setMessage(null);
     try {
+      const redirectTo = getRedirectTo();
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: `${window.location.origin}/auth/callback` },
+        options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(redirectTo)}` },
       });
       if (error) throw error;
     } catch (err: unknown) {
@@ -66,13 +76,14 @@ export default function LoginPage() {
     setMessage(null);
 
     try {
+      const redirectTo = getRedirectTo();
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) {
         const { error: signUpError } = await supabase.auth.signUp({ email, password });
         if (signUpError) throw signUpError;
         setMessage({ type: "success", text: "Account created! Check your email to confirm." });
       } else {
-        window.location.href = "/";
+        window.location.href = redirectTo;
       }
     } catch (err: unknown) {
       setMessage({ type: "error", text: err instanceof Error ? err.message : "Authentication failed." });
