@@ -8,6 +8,7 @@ import {
   Eye, EyeOff, Zap, Clock, Star, Wrench,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { PhoneAuth } from "@/components/PhoneAuth";
 
 function FloatingOrb({ delay, size, x, y }: { delay: string; size: string; x: string; y: string }) {
   return (
@@ -307,13 +308,18 @@ export default function LoginPage() {
               </button>
             </div>
 
-            {/* Divider */}
-            <div className={`relative flex items-center justify-center ${mounted ? "animate-slide-up-2" : "opacity-0"}`}>
-              <div className="border-t border-slate-800 w-full" />
-              <span className="bg-slate-950 px-3 text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                or sign in with email
-              </span>
-            </div>
+          {/* Phone OTP */}
+          <div className={`${mounted ? "animate-slide-up-2" : "opacity-0"}`}>
+            <PhoneAuth />
+          </div>
+
+          {/* Divider */}
+          <div className={`relative flex items-center justify-center ${mounted ? "animate-slide-up-2" : "opacity-0"}`}>
+            <div className="border-t border-slate-800 w-full" />
+            <span className="bg-slate-950 px-3 text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+              or sign in with email
+            </span>
+          </div>
 
             {/* Message */}
             {message && (
