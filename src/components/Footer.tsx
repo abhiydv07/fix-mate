@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { Wrench, ShieldCheck, Heart } from "lucide-react";
+import { Wrench, ShieldCheck, Heart, Briefcase } from "lucide-react";
 
 export function Footer() {
   return (
     <footer className="mt-12 bg-slate-900 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-900 px-4 md:px-8 py-8 text-slate-400">
       <div className="max-w-7xl mx-auto space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
           {/* Brand Column */}
           <div className="space-y-3">
             <div className="flex items-center gap-2.5">
@@ -40,6 +40,21 @@ export function Footer() {
               <li>30-Day Service Guarantee</li>
               <li>Background Verified Pros</li>
               <li>Zero Cancellation Fee</li>
+            </ul>
+          </div>
+
+          {/* For Providers */}
+          <div className="space-y-2">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300">For Providers</h4>
+            <ul className="space-y-1.5 text-xs">
+              <li>
+                <Link href="/login" className="flex items-center gap-1.5 hover:text-amber-400 transition-colors text-amber-400 font-semibold">
+                  <Briefcase className="w-3.5 h-3.5" /> Become a Service Pro
+                </Link>
+              </li>
+              <li><Link href="/provider/onboarding" className="hover:text-amber-400 transition-colors">Provider Registration</Link></li>
+              <li><Link href="/provider/dashboard" className="hover:text-amber-400 transition-colors">Provider Dashboard</Link></li>
+              <li><Link href="/provider/availability" className="hover:text-amber-400 transition-colors">Manage Availability</Link></li>
             </ul>
           </div>
 
