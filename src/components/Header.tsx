@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Wrench, MapPin, LogIn, LogOut, ShieldCheck, Bell, Search, ChevronDown, User } from "lucide-react";
+import { MapPin, LogIn, LogOut, ShieldCheck, Bell, Search, ChevronDown, User } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import { LocaleToggle } from "@/components/LocaleToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { getUserNotifications, markNotificationAsRead, NotificationItem } from "@/lib/notifications";
@@ -95,14 +96,8 @@ export function Header() {
         {/* Main header row */}
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
-              <Wrench className="w-5 h-5" />
-            </div>
-            <div className="hidden sm:block">
-              <h1 className="font-extrabold text-base leading-none text-slate-900 dark:text-white tracking-tight">Fix Mate</h1>
-              <p className="text-[9px] text-slate-400 font-medium tracking-wide">HOME SERVICES</p>
-            </div>
+          <Link href="/" className="shrink-0 group">
+            <Logo size={36} className="group-hover:opacity-90 transition-opacity" />
           </Link>
 
           {/* Location Selector */}

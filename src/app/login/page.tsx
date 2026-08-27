@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
-  Wrench, ShieldCheck, Mail, Lock, ArrowRight,
-  Eye, EyeOff, Zap, Clock, Star,
+  ShieldCheck, Mail, Lock, ArrowRight,
+  Eye, EyeOff, Zap, Clock, Star, Wrench,
 } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 function FloatingOrb({ delay, size, x, y }: { delay: string; size: string; x: string; y: string }) {
   return (
@@ -192,14 +193,8 @@ export default function LoginPage() {
           {/* Main content */}
           <div className="relative z-10 max-w-lg space-y-10">
             {/* Logo */}
-            <div className={`flex items-center gap-3 ${mounted ? "animate-slide-up" : "opacity-0"}`}>
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
-                <Wrench className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-black text-white tracking-tight">Fix Mate</h1>
-                <p className="text-sm text-white/50 font-medium">Home Services Marketplace</p>
-              </div>
+            <div className={`${mounted ? "animate-slide-up" : "opacity-0"}`}>
+              <Logo size={48} />
             </div>
 
             {/* Headline */}
@@ -269,12 +264,9 @@ export default function LoginPage() {
 
           <div className="relative z-10 max-w-sm w-full mx-auto space-y-7">
             {/* Mobile-only logo */}
-            <div className={`lg:hidden flex items-center gap-2.5 mb-4 ${mounted ? "animate-scale-in" : "opacity-0"}`}>
-              <Link href="/" className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-brand-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
-                  <Wrench className="w-5 h-5" />
-                </div>
-                <span className="font-bold text-xl text-white">Fix Mate</span>
+            <div className={`lg:hidden mb-4 ${mounted ? "animate-scale-in" : "opacity-0"}`}>
+              <Link href="/">
+                <Logo size={36} />
               </Link>
             </div>
 

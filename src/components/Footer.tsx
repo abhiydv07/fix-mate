@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Wrench, ShieldCheck, Heart, Briefcase } from "lucide-react";
+import { ShieldCheck, Heart, Briefcase } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export function Footer() {
   return (
@@ -8,12 +9,7 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
           {/* Brand Column */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-brand-500 flex items-center justify-center text-white font-bold">
-                <Wrench className="w-4 h-4" />
-              </div>
-              <span className="font-bold text-base text-white">Fix Mate</span>
-            </div>
+            <Logo size={32} />
             <p className="text-xs leading-relaxed text-slate-400">
               India&apos;s premier Pay-on-Work home services marketplace connecting customers with verified local professionals.
             </p>

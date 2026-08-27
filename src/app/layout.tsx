@@ -19,7 +19,8 @@ export const metadata: Metadata = {
   description: "Book trusted local service professionals for plumbing, electrical, cleaning, appliance repair, and home maintenance.",
   manifest: "/manifest.json",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.svg",
+    apple: "/favicon.svg",
   },
 };
 
