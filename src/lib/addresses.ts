@@ -41,8 +41,12 @@ export async function getUserAddresses(): Promise<AddressItem[]> {
       .eq("user_id", user.id)
       .order("is_default", { ascending: false });
 
-    if (error || !data || data.length === 0) {
+    if (error) {
       return FALLBACK_ADDRESSES;
+    }
+    // If user has real addresses, use those. Otherwise return empty (not fallback)
+    if (!data || data.length === 0) {
+      return [];
     }
     return data as AddressItem[];
   } catch {

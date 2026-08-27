@@ -189,7 +189,10 @@ export function AddressManager() {
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this address?")) {
+      // Optimistically remove from local state
+      setAddresses((prev) => prev.filter((a) => a.id !== id));
       await deleteAddress(id);
+      // Reload from DB to confirm
       loadAddresses();
     }
   };
