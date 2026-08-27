@@ -42,7 +42,7 @@ export default function RootLayout({
         <ServiceWorkerRegistration />
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <I18nProvider>
-        <div className="mx-auto max-w-md md:max-w-7xl w-full min-h-screen flex flex-col bg-white dark:bg-slate-950 border-x border-slate-200 dark:border-slate-900/50 shadow-xl shadow-slate-200/50 dark:shadow-none">
+        <div className="mx-auto w-full min-h-screen flex flex-col bg-white dark:bg-slate-950">
           <Header />
           <div id="main-content" className="flex-1" role="main">{children}</div>
           <Footer />
