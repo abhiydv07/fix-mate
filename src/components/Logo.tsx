@@ -16,99 +16,40 @@ export function Logo({ size = 36, className = "", showText = true }: LogoProps) 
         className="shrink-0"
       >
         <defs>
-          <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id="fm-grad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#2563eb" />
-            <stop offset="50%" stopColor="#3b82f6" />
             <stop offset="100%" stopColor="#f59e0b" />
           </linearGradient>
-          <linearGradient id="logo-grad-dark" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#1d4ed8" />
-            <stop offset="100%" stopColor="#d97706" />
-          </linearGradient>
-          <filter id="logo-shadow">
-            <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#2563eb" floodOpacity="0.3" />
-          </filter>
         </defs>
 
-        {/* Background — rounded square with gradient */}
-        <rect
-          x="4"
-          y="4"
-          width="92"
-          height="92"
-          rx="22"
-          fill="url(#logo-grad)"
-          filter="url(#logo-shadow)"
-        />
+        {/* Background */}
+        <rect x="0" y="0" width="100" height="100" rx="24" fill="url(#fm-grad)" />
 
-        {/* Inner subtle shine */}
-        <rect
-          x="4"
-          y="4"
-          width="92"
-          height="46"
-          rx="22"
-          fill="white"
-          opacity="0.12"
-        />
-
-        {/* House roof — unique angular shape */}
-        <path
-          d="M50 18 L82 44 L74 44 L74 72 L26 72 L26 44 L18 44 Z"
-          fill="white"
-          opacity="0.95"
-        />
-
-        {/* Door opening */}
-        <rect
-          x="42"
-          y="52"
-          width="16"
-          height="20"
-          rx="3"
-          fill="url(#logo-grad-dark)"
-          opacity="0.9"
-        />
-
-        {/* Wrench handle — goes through the door diagonally */}
-        <g transform="translate(50, 62) rotate(-45)">
-          {/* Handle */}
-          <rect
-            x="-2"
-            y="-18"
-            width="4"
-            height="28"
-            rx="2"
-            fill="white"
-            opacity="0.95"
-          />
-          {/* Wrench head top */}
-          <path
-            d="M-7 -18 L7 -18 L5 -12 L-5 -12 Z"
-            fill="white"
-            opacity="0.95"
-          />
-          {/* Wrench head notch */}
-          <rect
-            x="-2"
-            y="-22"
-            width="4"
-            height="5"
-            rx="1"
-            fill="url(#logo-grad-dark)"
-          />
+        {/* Letter F — left side */}
+        <g>
+          {/* Vertical stroke of F */}
+          <rect x="22" y="24" width="12" height="52" rx="3" fill="white" />
+          {/* Top horizontal bar of F */}
+          <rect x="22" y="24" width="36" height="12" rx="3" fill="white" />
+          {/* Middle horizontal bar of F */}
+          <rect x="22" y="42" width="26" height="10" rx="3" fill="white" />
+          {/* Wrench notch — small cutout in bottom of F's vertical stroke */}
+          <rect x="25" y="66" width="6" height="3" rx="1.5" fill="url(#fm-grad)" />
         </g>
 
-        {/* Checkmark — small, in bottom-right corner */}
-        <path
-          d="M62 60 L68 66 L80 50"
-          stroke="white"
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          opacity="0.9"
-        />
+        {/* Letter M — right side */}
+        <g>
+          {/* Left vertical stroke of M */}
+          <rect x="48" y="24" width="10" height="52" rx="3" fill="white" />
+          {/* Right vertical stroke of M */}
+          <rect x="72" y="24" width="10" height="52" rx="3" fill="white" />
+          {/* Left diagonal of M */}
+          <path d="M48 24 L57 24 L63 42 L54 42 Z" fill="white" />
+          {/* Right diagonal of M */}
+          <path d="M72 24 L80 24 L80 42 L66 42 L63 42 Z" fill="white" fillRule="evenodd" />
+          {/* Bottom connecting bar */}
+          <rect x="48" y="64" width="34" height="12" rx="3" fill="white" />
+        </g>
       </svg>
 
       {showText && (
@@ -125,7 +66,6 @@ export function Logo({ size = 36, className = "", showText = true }: LogoProps) 
   );
 }
 
-/* Favicon SVG — smaller, no text */
 export function LogoIcon({ size = 32 }: { size?: number }) {
   return (
     <svg
@@ -136,22 +76,25 @@ export function LogoIcon({ size = 32 }: { size?: number }) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <linearGradient id="icon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id="fm-grad-icon" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#2563eb" />
-          <stop offset="50%" stopColor="#3b82f6" />
           <stop offset="100%" stopColor="#f59e0b" />
         </linearGradient>
       </defs>
-      <rect x="4" y="4" width="92" height="92" rx="22" fill="url(#icon-grad)" />
-      <rect x="4" y="4" width="92" height="46" rx="22" fill="white" opacity="0.12" />
-      <path d="M50 18 L82 44 L74 44 L74 72 L26 72 L26 44 L18 44 Z" fill="white" opacity="0.95" />
-      <rect x="42" y="52" width="16" height="20" rx="3" fill="#1d4ed8" opacity="0.9" />
-      <g transform="translate(50, 62) rotate(-45)">
-        <rect x="-2" y="-18" width="4" height="28" rx="2" fill="white" opacity="0.95" />
-        <path d="M-7 -18 L7 -18 L5 -12 L-5 -12 Z" fill="white" opacity="0.95" />
-        <rect x="-2" y="-22" width="4" height="5" rx="1" fill="#1d4ed8" />
+      <rect x="0" y="0" width="100" height="100" rx="24" fill="url(#fm-grad-icon)" />
+      <g>
+        <rect x="22" y="24" width="12" height="52" rx="3" fill="white" />
+        <rect x="22" y="24" width="36" height="12" rx="3" fill="white" />
+        <rect x="22" y="42" width="26" height="10" rx="3" fill="white" />
+        <rect x="25" y="66" width="6" height="3" rx="1.5" fill="url(#fm-grad-icon)" />
       </g>
-      <path d="M62 60 L68 66 L80 50" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.9" />
+      <g>
+        <rect x="48" y="24" width="10" height="52" rx="3" fill="white" />
+        <rect x="72" y="24" width="10" height="52" rx="3" fill="white" />
+        <path d="M48 24 L57 24 L63 42 L54 42 Z" fill="white" />
+        <path d="M72 24 L80 24 L80 42 L66 42 L63 42 Z" fill="white" fillRule="evenodd" />
+        <rect x="48" y="64" width="34" height="12" rx="3" fill="white" />
+      </g>
     </svg>
   );
 }
