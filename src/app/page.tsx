@@ -30,6 +30,7 @@ import { FeaturedPro } from "@/components/FeaturedPro";
 import { BlogArticles } from "@/components/BlogArticles";
 import { AppDownloadCTA } from "@/components/AppDownloadCTA";
 import { RecentlyViewed } from "@/components/RecentlyViewed";
+import { CategoryModal } from "@/components/CategoryModal";
 
 interface Service {
   id: string;
@@ -70,6 +71,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedCoupon, setCopiedCoupon] = useState<string | null>(null);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [modalCategory, setModalCategory] = useState<string | null>(null);
   const supabase = createClient();
 
   useEffect(() => {
@@ -149,16 +151,20 @@ export default function Home() {
                   { name: "Pest Control", icon: "🐛", color: "bg-lime-50", darkColor: "dark:bg-lime-500/10", href: "/services/cleaning" },
                   { name: "All Services", icon: "✨", color: "bg-brand-50", darkColor: "dark:bg-brand-500/10", href: "/services" },
                 ].map((cat) => (
-                  <Link
+                  <button
                     key={cat.name}
-                    href={cat.href}
-                    className="flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:shadow-lg hover:border-brand-200 dark:hover:border-brand-500/30 transition-all group"
+                    onClick={() => {
+                      if (cat.href === "/services") return; // "All Services" goes to page
+                      const key = cat.href.split("/").pop() || "";
+                      setModalCategory(key);
+                    }}
+                    className="flex flex-col items-center gap-2.5 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:shadow-lg hover:border-brand-200 dark:hover:border-brand-500/30 transition-all group cursor-pointer text-left w-full"
                   >
                     <div className={`w-14 h-14 rounded-2xl ${cat.color} ${cat.darkColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>                      
                       <span className="text-2xl">{cat.icon}</span>
                     </div>
                     <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-brand-500 dark:group-hover:text-brand-400 transition-colors text-center leading-tight">{cat.name}</span>
-                  </Link>
+                  </button>
                 ))}
               </div>
 
@@ -585,6 +591,15 @@ export default function Home() {
           </Link>
         </section>
       </main>
+
+      {/* Category Modal */}
+      {modalCategory && (
+        <CategoryModal
+          categoryKey={modalCategory}
+          isOpen={!!modalCategory}
+          onClose={() => setModalCategory(null)}
+        />
+      )}
     </div>
   );
 }
