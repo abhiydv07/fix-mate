@@ -33,6 +33,10 @@ export default function AccountPage() {
   const [stats, setStats] = useState<Stats>({ totalOrders: 0, completedOrders: 0, walletBalance: 0, referralEarnings: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [showRoleSwitch, setShowRoleSwitch] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteEmail, setDeleteEmail] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   const supabase = createClient();
 
   useEffect(() => { loadProfile(); }, []);
@@ -59,6 +63,32 @@ export default function AccountPage() {
   }
 
   const handleSignOut = async () => { await supabase.auth.signOut(); window.location.href = "/"; };
+
+  const handleDeleteAccount = async () => {
+    setDeleteError("");
+    if (!profile?.email || deleteEmail !== profile.email) {
+      setDeleteError("Please type your email exactly to confirm");
+      return;
+    }
+    setDeleteLoading(true);
+    try {
+      const res = await fetch("/api/account/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmEmail: deleteEmail }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        window.location.href = "/";
+      } else {
+        setDeleteError(data.error || "Failed to delete account");
+      }
+    } catch {
+      setDeleteError("Network error. Please try again.");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   const menuSections = [
     {
@@ -221,7 +251,7 @@ export default function AccountPage() {
                 <span className="text-[10px] text-slate-400">Sign out of your account</span>
               </div>
             </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-slate-800/50 transition-colors text-left">
+            <button onClick={() => { setShowDeleteModal(true); setDeleteEmail(""); setDeleteError(""); }} className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-slate-800/50 transition-colors text-left">
               <div className="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400">
                 <AlertTriangle className="w-4.5 h-4.5" />
               </div>
@@ -236,6 +266,68 @@ export default function AccountPage() {
         {/* App Version */}
         <p className="text-center text-[10px] text-slate-600">Fix Mate v1.0.0 • Built with 💙</p>
       </main>
+
+      {/* Delete Account Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => !deleteLoading && setShowDeleteModal(false)} />
+          <div className="relative bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-sm space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-rose-400" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white">Delete Account</h3>
+                <p className="text-[10px] text-slate-400">This action cannot be undone</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed">
+              This will permanently delete your account, all bookings, addresses, payment methods, reviews, and wallet data. You will be signed out immediately.
+            </p>
+
+            <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-3">
+              <p className="text-[10px] font-bold text-rose-400 mb-2">Type your email to confirm:</p>
+              <p className="text-[10px] text-slate-400 mb-2 font-mono">{profile?.email}</p>
+              <input
+                type="email"
+                value={deleteEmail}
+                onChange={(e) => setDeleteEmail(e.target.value)}
+                placeholder="Type your email here"
+                className="w-full px-3 py-2 text-xs bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                disabled={deleteLoading}
+              />
+            </div>
+
+            {deleteError && (
+              <p className="text-[10px] text-rose-400 bg-rose-500/10 px-3 py-2 rounded-lg">{deleteError}</p>
+            )}
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleteLoading}
+                className="flex-1 px-4 py-2.5 text-xs font-bold text-slate-300 bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteLoading || !deleteEmail}
+                className="flex-1 px-4 py-2.5 text-xs font-bold text-white bg-rose-600 rounded-xl hover:bg-rose-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleteLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Deleting...
+                  </span>
+                ) : (
+                  "Delete Forever"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
